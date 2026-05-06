@@ -137,7 +137,11 @@ namespace ClassicUO.Assets
                                 continue;
                             }
 
-                            uint number = uint.Parse(parts[2], NumberStyles.HexNumber);
+                            if (!uint.TryParse(parts[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint number))
+                            {
+                                Log.Warn($"Invalid mobtypes.txt animation flag value. Line: {line}");
+                                continue;
+                            }
 
                             for (int i = 0; i < 5; i++)
                             {

@@ -325,8 +325,8 @@ namespace ClassicUO.Game.Scenes
             _world.MessageManager.MessageReceived -= ChatOnMessageReceived;
 
             Settings.GlobalSettings.WindowSize = new Point(
-                Client.Game.Window.ClientBounds.Width,
-                Client.Game.Window.ClientBounds.Height
+                Client.Game.ClientBounds.Width,
+                Client.Game.ClientBounds.Height
             );
 
             Settings.GlobalSettings.IsWindowMaximized = Client.Game.IsWindowMaximized();
@@ -568,18 +568,27 @@ namespace ClassicUO.Game.Scenes
 
             GetViewPort();
 
-            var useObjectHandles = _world.NameOverHeadManager.IsToggled || Keyboard.Ctrl && Keyboard.Shift;
+            var ctrlShiftHeld = Keyboard.Ctrl && Keyboard.Shift;
+            var useObjectHandles = _world.NameOverHeadManager.IsToggled || ctrlShiftHeld;
             if (useObjectHandles != _useObjectHandles)
             {
                 _useObjectHandles = useObjectHandles;
                 if (_useObjectHandles)
                 {
                     _world.NameOverHeadManager.Open();
+                    if (_world.NameOverHeadManager.IsToggled && !ctrlShiftHeld)
+                    {
+                        _world.NameOverHeadManager.SetMenuVisible(false);
+                    }
                 }
                 else
                 {
                     _world.NameOverHeadManager.Close();
                 }
+            }
+            else if (_useObjectHandles && _world.NameOverHeadManager.IsToggled)
+            {
+                _world.NameOverHeadManager.SetMenuVisible(ctrlShiftHeld);
             }
 
             _rectanglePlayer.X = (int)(

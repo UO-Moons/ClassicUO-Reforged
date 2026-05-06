@@ -284,16 +284,7 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("AnimatedWaterEffect", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Weather effects (Splash & Ripples).
-        /// </summary>
-        public static string WeatherEffects {
-            get {
-                return ResourceManager.GetString("WeatherEffects", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Anisotropic Clamp.
         /// </summary>
@@ -1070,7 +1061,7 @@ namespace ClassicUO.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ClassicUO Version {0}.
+        ///   Looks up a localized string similar to CUOF Version {0}.
         /// </summary>
         public static string CUOVersion0 {
             get {
@@ -1167,7 +1158,18 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("Decline", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Screen zoom:.
+        /// </summary>
+        public static string ScreenZoom
+        {
+            get
+            {
+                return ResourceManager.GetString("ScreenZoom", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Default zoom:.
         /// </summary>
@@ -3187,7 +3189,7 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("PlayFootsteps", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Play Rain Sound.
         /// </summary>
@@ -3196,7 +3198,7 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("PlayRainSound", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Poisoned Color.
         /// </summary>
@@ -4568,6 +4570,15 @@ namespace ClassicUO.Resources {
         public static string WeaponDamageIncrease {
             get {
                 return ResourceManager.GetString("WeaponDamageIncrease", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather effects (Splash &amp; Ripples).
+        /// </summary>
+        public static string WeatherEffects {
+            get {
+                return ResourceManager.GetString("WeatherEffects", resourceCulture);
             }
         }
         

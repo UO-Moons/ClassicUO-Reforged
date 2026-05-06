@@ -196,7 +196,7 @@ namespace ClassicUO.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://classicuo.eu.
+        ///   Looks up a localized string similar to https://github.com/UO-Moons/ClassicUO-Reforged.
         /// </summary>
         public static string ClassicUOLink {
             get {
@@ -1029,7 +1029,7 @@ namespace ClassicUO.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ClassicUO - {0}.
+        ///   Looks up a localized string similar to ClassicUO Reforged {0}.
         /// </summary>
         public static string WindowTitle0 {
             get {
@@ -1210,9 +1210,9 @@ namespace ClassicUO.Resources {
         
         /// <summary>
         ///   Looks up a localized string similar to Your Ultima Online client version seems to be invalid.
-        ///Download the official Launcher to setup and run your game.
+        ///Please verify your Ultima Online installation and client files.
         ///
-        ///Link: classicuo.eu.
+        ///Link: https://github.com/UO-Moons/ClassicUO-Reforged.
         /// </summary>
         public static string YourUOClientVersionIsInvalid {
             get {
@@ -1222,9 +1222,9 @@ namespace ClassicUO.Resources {
         
         /// <summary>
         ///   Looks up a localized string similar to Your Ultima Online directory seems to be invalid.
-        ///Download the official Launcher to setup and run your game.
+        ///Please verify your Ultima Online installation path and try again.
         ///
-        ///Link: classicuo.eu.
+        ///Link: https://github.com/UO-Moons/ClassicUO-Reforged.
         /// </summary>
         public static string YourUODirectoryIsInvalid {
             get {

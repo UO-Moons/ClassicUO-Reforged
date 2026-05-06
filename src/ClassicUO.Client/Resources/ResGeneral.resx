@@ -384,20 +384,22 @@ Hue: {1}</value>
     <value>You have been banned from this conference.</value>
   </data>
   <data name="YourUODirectoryIsInvalid" xml:space="preserve">
-    <value>Your Ultima Online directory seems to be invalid.
-Download the official Launcher to setup and run your game.
+  <value>Your Ultima Online directory seems to be invalid.
+Please verify your Ultima Online installation path and try again.
 
-Link: classicuo.eu</value>
-  </data>
+Link: https://github.com/UO-Moons/ClassicUO-Reforged</value>
+</data>
+
   <data name="YourUOClientVersionIsInvalid" xml:space="preserve">
-    <value>Your Ultima Online client version seems to be invalid.
-Download the official Launcher to setup and run your game.
+  <value>Your Ultima Online client version seems to be invalid.
+Please verify your Ultima Online installation and client files.
 
-Link: classicuo.eu</value>
-  </data>
+Link: https://github.com/UO-Moons/ClassicUO-Reforged</value>
+</data>
+
   <data name="ClassicUOLink" xml:space="preserve">
-    <value>https://classicuo.eu</value>
-  </data>
+  <value>https://github.com/UO-Moons/ClassicUO-Reforged</value>
+</data>
   <data name="ItBeginsToRain" xml:space="preserve">
     <value>It begins to rain.</value>
   </data>
@@ -507,7 +509,7 @@ Ultima Online?</value>
     <value>Screenshot stored in: {0}</value>
   </data>
   <data name="WindowTitle0" xml:space="preserve">
-    <value>ClassicUO - {0}</value>
+    <value>ClassicUO Reforged {0}</value>
   </data>
   <data name="Invariant" xml:space="preserve">
     <value>Invariant</value>

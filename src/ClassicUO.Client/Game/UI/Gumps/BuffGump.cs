@@ -21,6 +21,7 @@ namespace ClassicUO.Game.UI.Gumps
         private GumpDirection _direction;
         private ushort _graphic;
         private DataBox _box;
+        private int _shiftX, _shiftY;
 
         public BuffGump(World world) : base(world, 0, 0)
         {
@@ -46,6 +47,12 @@ namespace ClassicUO.Game.UI.Gumps
 
         private void BuildGump()
         {
+            // Undo previous shift to restore anchor position
+            X -= _shiftX;
+            Y -= _shiftY;
+            _shiftX = 0;
+            _shiftY = 0;
+
             WantUpdateSize = true;
 
             _box?.Clear();
@@ -94,7 +101,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             if (World.Player != null)
             {
-                foreach (KeyValuePair<BuffIconType, BuffIcon> k in World.Player.BuffIcons)
+                foreach (var k in World.Player.BuffIcons)
                 {
                     _box.Add(new BuffControlEntry(World.Player.BuffIcons[k.Key]));
                 }
@@ -109,7 +116,12 @@ namespace ClassicUO.Game.UI.Gumps
 
         public override void Save(XmlTextWriter writer)
         {
+            // Save the anchor position (un-shifted)
+            X -= _shiftX;
+            Y -= _shiftY;
             base.Save(writer);
+            X += _shiftX;
+            Y += _shiftY;
             writer.WriteAttributeString("graphic", _graphic.ToString());
             writer.WriteAttributeString("direction", ((int)_direction).ToString());
         }
@@ -130,7 +142,10 @@ namespace ClassicUO.Game.UI.Gumps
 
         private void UpdateElements()
         {
-            for (int i = 0, offset = 0; i < _box.Children.Count; i++, offset += 31)
+            int count = _box.Children.Count;
+
+            // Position icons at their natural locations
+            for (int i = 0, offset = 0; i < count; i++, offset += 31)
             {
                 Control e = _box.Children[i];
 
@@ -161,6 +176,62 @@ namespace ClassicUO.Game.UI.Gumps
                         break;
                 }
             }
+            // Find if any icons have negative positions (RIGHT variants with many icons)
+            int minX = 0, minY = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                Control e = _box.Children[i];
+
+                if (e.X < minX)
+                    minX = e.X;
+
+                if (e.Y < minY)
+                    minY = e.Y;
+            }
+
+            // If icons extend beyond origin, shift everything so all coords are non-negative,
+            // then move the gump origin to compensate (keeping the background at the same screen position).
+            if (minX < 0 || minY < 0)
+            {
+                int shiftX = minX < 0 ? -minX : 0;
+                int shiftY = minY < 0 ? -minY : 0;
+
+                for (int i = 0; i < count; i++)
+                {
+                    _box.Children[i].X += shiftX;
+                    _box.Children[i].Y += shiftY;
+                }
+
+                _background.X += shiftX;
+                _background.Y += shiftY;
+                _button.X += shiftX;
+                _button.Y += shiftY;
+
+                _shiftX = -shiftX;
+                _shiftY = -shiftY;
+                X += _shiftX;
+                Y += _shiftY;
+            }
+
+            // Explicitly size the box to encompass all icon positions.
+            int boxW = 0, boxH = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                Control e = _box.Children[i];
+                int right = e.X + e.Width;
+                int bottom = e.Y + e.Height;
+
+                if (right > boxW)
+                    boxW = right;
+
+                if (bottom > boxH)
+                    boxH = bottom;
+            }
+
+            _box.Width = boxW;
+            _box.Height = boxH;
         }
 
         public override void OnButtonClick(int buttonID)
@@ -242,7 +313,7 @@ namespace ClassicUO.Game.UI.Gumps
                 WantUpdateSize = false;
                 CanMove = true;
 
-                SetTooltip(icon.Text);
+                SetTooltip(icon.Text + $"\nID: {icon.Type}");
             }
 
             public BuffIcon Icon { get; }
@@ -262,7 +333,7 @@ namespace ClassicUO.Game.UI.Gumps
                         SetTooltip(
                             string.Format(
                                 ResGumps.TimeLeft,
-                                Icon.Text,
+                                Icon.Text + $"\nID: {Icon.Type}",
                                 span.Hours,
                                 span.Minutes,
                                 span.Seconds

@@ -115,14 +115,14 @@ namespace ClassicUO.Game.UI.Gumps
                 position.Y = -halfHeight;
             }
 
-            if (X > Client.Game.Window.ClientBounds.Width - (Width - halfWidth))
+            if (X > Client.Game.ClientBounds.Width - (Width - halfWidth))
             {
-                position.X = Client.Game.Window.ClientBounds.Width - (Width - halfWidth);
+                position.X = Client.Game.ClientBounds.Width - (Width - halfWidth);
             }
 
-            if (Y > Client.Game.Window.ClientBounds.Height - (Height - halfHeight))
+            if (Y > Client.Game.ClientBounds.Height - (Height - halfHeight))
             {
-                position.Y = Client.Game.Window.ClientBounds.Height - (Height - halfHeight);
+                position.Y = Client.Game.ClientBounds.Height - (Height - halfHeight);
             }
 
             Location = position;

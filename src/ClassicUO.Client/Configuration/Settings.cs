@@ -55,6 +55,7 @@ namespace ClassicUO.Configuration
         [JsonPropertyName("last_server_name")] public string LastServerName { get; set; } = string.Empty;
 
         [JsonPropertyName("fps")] public int FPS { get; set; } = 60;
+        [JsonPropertyName("screen_scale")] public float ScreenScale { get; set; } = 1f;
 
         [JsonConverter(typeof(NullablePoint2Converter))] [JsonPropertyName("window_position")] public Point? WindowPosition { get; set; }
         [JsonConverter(typeof(NullablePoint2Converter))] [JsonPropertyName("window_size")] public Point? WindowSize { get; set; }

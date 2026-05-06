@@ -1,11 +1,11 @@
 <Project>
   <PropertyGroup>
-    <Company>ClassicUO</Company>
-    <Authors>KaRaShO'</Authors>
+    <Company>UO-Moons</Company>
+    <Authors>UO-Moons; ClassicUO Contributors</Authors>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
-    <Copyright>ClassicUO</Copyright>
-    <PackageProjectUrl>https://www.classicuo.eu/</PackageProjectUrl>
-    <Description>An open source implementation of the Ultima Online Classic Client.</Description>
+    <Copyright>ClassicUO Reforged</Copyright>
+    <PackageProjectUrl>https://github.com/UO-Moons/ClassicUO-Reforged</PackageProjectUrl>
+    <Description>Independent Ultima Online client project based on the ClassicUO codebase.</Description>
   </PropertyGroup>
 </Project>
