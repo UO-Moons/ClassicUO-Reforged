@@ -52,6 +52,20 @@ namespace ClassicUO.Game.UI.Gumps
 
         private static readonly ChatMode[] SINGLE_LINE_CHAT_MODES = [ChatMode.ClientCommand, ChatMode.Prompt];
 
+        private static int GetChatLineSpacing()
+        {
+            Profile profile = ProfileManager.CurrentProfile;
+
+            if (profile == null || !profile.AccessibilityEnabled)
+            {
+                return 0;
+            }
+
+            return profile.ChatLineSpacing;
+        }
+
+        private static int GetChatLineHeight() => CHAT_HEIGHT + GetChatLineSpacing();
+
 
         public SystemChatControl(WorldViewportGump gump, int x, int y, int w, int h)
         {
@@ -437,19 +451,20 @@ namespace ClassicUO.Game.UI.Gumps
             if (TextBoxControl != null)
             {
                 int lines = TextBoxControl.Text.Count('\n') + 1;
+                int lineHeight = GetChatLineHeight();
 
                 // the chat mode is always on the left and on the bottom
                 _currentChatModeLabel.X = CHAT_X_OFFSET;
-                _currentChatModeLabel.Y = Height - CHAT_HEIGHT - CHAT_X_OFFSET;
+                _currentChatModeLabel.Y = Height - lineHeight - CHAT_X_OFFSET;
 
                 // if the chat mode is visible, it should push the text box further to the right
                 int chatModeOffset = _currentChatModeLabel.IsVisible ? _currentChatModeLabel.Width : 0;
                 TextBoxControl.X = CHAT_X_OFFSET + chatModeOffset;
-                TextBoxControl.Y = Height - lines * CHAT_HEIGHT - CHAT_X_OFFSET;
+                TextBoxControl.Y = Height - lines * lineHeight - CHAT_X_OFFSET;
                 // if the text box has been pushed to the right, it should not clip into the void
                 TextBoxControl.Width = Width - CHAT_X_OFFSET - chatModeOffset;
                 // if the text box has more than one line, it will grow upwards
-                TextBoxControl.Height = lines * CHAT_HEIGHT + CHAT_X_OFFSET;
+                TextBoxControl.Height = lines * lineHeight + CHAT_X_OFFSET;
                 
                 // the dark background should always cover chat mode and text box fully
                 _trans.X = TextBoxControl.X - CHAT_X_OFFSET - chatModeOffset;
@@ -579,7 +594,7 @@ namespace ClassicUO.Game.UI.Gumps
                     }
                     else
                     {
-                        yy -= last.Value.TextHeight;
+                        yy -= last.Value.TextHeight + GetChatLineSpacing();
 
                         if (yy >= y)
                         {

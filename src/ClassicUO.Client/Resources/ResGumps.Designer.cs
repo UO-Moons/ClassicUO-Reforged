@@ -4608,6 +4608,14 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("AnimationIntensity", resourceCulture);
             }
         }
+        /// <summary>
+        ///   Looks up a localized string similar to Accessibility Preset.
+        /// </summary>
+        public static string AccessibilityPreset {
+            get {
+                return ResourceManager.GetString("AccessibilityPreset", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to [Whisper]: .

@@ -498,6 +498,11 @@
   <data name="AnimationIntensity" xml:space="preserve">
     <value>Animation Intensity</value>
   </data>
+
+  <data name="AccessibilityPreset" xml:space="preserve">
+    <value>Accessibility Preset</value>
+  </data>
+
   <data name="UseXBREffectBETA" xml:space="preserve">
     <value>Use xBR effect [BETA]</value>
   </data>
