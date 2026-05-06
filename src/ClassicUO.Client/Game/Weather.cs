@@ -318,7 +318,7 @@ namespace ClassicUO.Game
 
                         CurrentWeather = type;
 
-                        PlayThunder();
+                        TryPlayThunder();
                     }
 
                     break;
@@ -358,7 +358,7 @@ namespace ClassicUO.Game
 
                         CurrentWeather = type;
 
-                        PlayThunder();
+                        TryPlayThunder();
                     }
 
                     break;
@@ -449,7 +449,6 @@ namespace ClassicUO.Game
 
             return (byte)Math.Max(1, Math.Min(byte.MaxValue, scaledCount));
         }
-
         private static float GetAccessibilityWeatherIntensityScale()
         {
             Profile profile = ProfileManager.CurrentProfile;
@@ -459,6 +458,11 @@ namespace ClassicUO.Game
                 return 1.0f;
             }
 
+            return Math.Clamp(profile.AnimationIntensityPercent / 100.0f, 0.0f, 1.0f);
+        }
+
+        private static float GetAccessibilityWeatherIntensityScale()
+        {
             return profile.AnimationIntensityPercent / 100.0f;
         }
 
@@ -600,9 +604,23 @@ namespace ClassicUO.Game
             PlaySound(RandomHelper.RandomList(0x014, 0x015, 0x016));
         }
 
-        private void PlayThunder()
+        private void TryPlayThunder()
         {
+            if (ShouldSuppressThunderForAccessibility())
+            {
+                return;
+            }
+
             PlaySound(RandomHelper.RandomList(0x028, 0x206));
+        }
+
+        private static bool ShouldSuppressThunderForAccessibility()
+        {
+            Profile profile = ProfileManager.CurrentProfile;
+
+            return profile != null
+                   && profile.AccessibilityEnabled
+                   && profile.ReduceFlashEffects;
         }
 
         private void PlayMinorRain()
@@ -968,7 +986,7 @@ namespace ClassicUO.Game
 
                         if (windChanged)
                         {
-                            PlayThunder();
+                            TryPlayThunder();
                         }
 
                         break;
@@ -1024,7 +1042,7 @@ namespace ClassicUO.Game
 
                             effect.SpeedMagnitude = (float)Math.Sqrt(Math.Pow(effect.SpeedX, 2) + Math.Pow(effect.SpeedY, 2));
 
-                            PlayThunder();
+                            TryPlayThunder();
                         }
 
                         float speedAngle = effect.SpeedAngle;
