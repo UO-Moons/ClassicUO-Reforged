@@ -1957,30 +1957,34 @@ namespace ClassicUO.Game.UI.Gumps
             startY += 25;
 
             section4.Add(AddLabel(null, ResGumps.AccessibilityPreset, startX, startY));
-            section4.AddRight(_accessibilityPreset = AddCombobox(null, 150, new[] { "Default", "High Contrast", "Low Motion", "Readability" }, (int)_currentProfile.AccessibilityPreset, startX, startY));
+            section4.AddRight
+            (
+                _accessibilityPreset = AddCombobox
+                (
+                    null,
+                    new[] { "Default", "High Contrast", "Low Motion", "Readability" },
+                    (int)_currentProfile.AccessibilityPreset,
+                    startX,
+                    startY,
+                    150
+                )
+            );
 
             startY += 25;
-            section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
+           //section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
 
+            //startY += 25;
+            //section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
 
-            section4.Add(AddLabel(null, ResGumps.AccessibilityPreset, startX, startY));
-            section4.AddRight(_accessibilityPreset = AddCombobox(null, 150, ["Default", "High Contrast", "Low Motion", "Readability"], (int)_currentProfile.AccessibilityPreset, startX, startY));
-
-            startY += 25;
-            section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
-
-            section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
+            //section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
 
             
-            section4.Add(_accessibilityEnabled = AddCheckBox(null, "Accessibility Mode", _currentProfile.AccessibilityEnabled, startX, startY));
-            section4.AddRight(_reduceFlashEffects = AddCheckBox(null, "Reduce Flash Effects", _currentProfile.ReduceFlashEffects, startX, startY));
+           section4.Add(_accessibilityEnabled = AddCheckBox(null, "Accessibility Mode", _currentProfile.AccessibilityEnabled, startX, startY));
+           section4.AddRight(_reduceFlashEffects = AddCheckBox(null, "Reduce Flash Effects", _currentProfile.ReduceFlashEffects, startX, startY));
 
             startY += 25;
             section4.Add(AddLabel(null, "Animation Intensity", startX, startY));
-
-
             section4.AddRight(_accessibilityAnimationIntensity = AddHSlider(null, 0, 100, _currentProfile.AnimationIntensityPercent, startX, startY, 200));
-
 
             SettingsSection section5 = AddSettingsSection(box, "Shadows");
             section5.Y = section4.Bounds.Bottom + 40;
