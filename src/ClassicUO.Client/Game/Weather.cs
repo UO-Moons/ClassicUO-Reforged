@@ -449,10 +449,9 @@ namespace ClassicUO.Game
 
             return (byte)Math.Max(1, Math.Min(byte.MaxValue, scaledCount));
         }
-        private static float GetAccessibilityWeatherIntensityScale()
-        {
-            Profile profile = ProfileManager.CurrentProfile;
 
+        internal static float GetAccessibilityWeatherIntensityScale(Profile profile)
+        {
             if (profile == null || !profile.AccessibilityEnabled)
             {
                 return 1.0f;
@@ -463,7 +462,7 @@ namespace ClassicUO.Game
 
         private static float GetAccessibilityWeatherIntensityScale()
         {
-            return profile.AnimationIntensityPercent / 100.0f;
+            return GetAccessibilityWeatherIntensityScale(ProfileManager.CurrentProfile);
         }
 
         private enum RainRenderStyle
