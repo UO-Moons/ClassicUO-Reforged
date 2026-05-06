@@ -503,6 +503,12 @@
     <value>Accessibility Preset</value>
   </data>
 
+
+  <data name="AccessibilityPreset" xml:space="preserve">
+    <value>Accessibility Preset</value>
+  </data>
+
+
   <data name="UseXBREffectBETA" xml:space="preserve">
     <value>Use xBR effect [BETA]</value>
   </data>
