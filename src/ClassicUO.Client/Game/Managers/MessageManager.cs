@@ -101,7 +101,7 @@ namespace ClassicUO.Game.Managers
 
             if (currentProfile != null && currentProfile.OverrideAllFonts)
             {
-                font = currentProfile.ChatFont;
+                font = currentProfile.GetEffectiveChatFont();
                 unicode = currentProfile.OverrideAllFontsIsUnicode;
             }
 
@@ -301,7 +301,7 @@ namespace ClassicUO.Game.Managers
         {
             if (ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.OverrideAllFonts)
             {
-                font = ProfileManager.CurrentProfile.ChatFont;
+                font = ProfileManager.CurrentProfile.GetEffectiveChatFont();
                 isunicode = ProfileManager.CurrentProfile.OverrideAllFontsIsUnicode;
             }
 

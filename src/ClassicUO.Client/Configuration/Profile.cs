@@ -19,6 +19,22 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Configuration
 {
+    internal enum AccessibilityPreset
+    {
+        Default = 0,
+        HighContrast = 1,
+        LowMotion = 2,
+        Readability = 3
+    }
+
+    internal enum AccessibilityColorMode
+    {
+        Normal = 0,
+        Protanopia = 1,
+        Deuteranopia = 2,
+        Tritanopia = 3
+    }
+
     //[JsonSourceGenerationOptions(WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.Unspecified)]
     [JsonSerializable(typeof(GlobalProfile), GenerationMode = JsonSourceGenerationMode.Metadata)]
     [JsonSerializable(typeof(Profile), GenerationMode = JsonSourceGenerationMode.Metadata)]
@@ -54,6 +70,13 @@ namespace ClassicUO.Configuration
 
     internal sealed class Profile
     {
+        public const int MIN_UI_FONT_SCALE_PERCENT = 80;
+        public const int MAX_UI_FONT_SCALE_PERCENT = 200;
+        public const int MIN_CHAT_LINE_SPACING = 0;
+        public const int MAX_CHAT_LINE_SPACING = 20;
+        public const int MIN_ANIMATION_INTENSITY_PERCENT = 0;
+        public const int MAX_ANIMATION_INTENSITY_PERCENT = 100;
+
         [JsonIgnore] public string Username { get; set; }
         [JsonIgnore] public string ServerName { get; set; }
         [JsonIgnore] public string CharacterName { get; set; }
@@ -104,6 +127,16 @@ namespace ClassicUO.Configuration
         public ushort InvulnerableHue { get; set; } = 0x0030;
 
         // visual
+        public bool AccessibilityEnabled { get; set; }
+        public AccessibilityPreset AccessibilityPreset { get; set; } = AccessibilityPreset.Default;
+        public AccessibilityColorMode AccessibilityColorMode { get; set; } = AccessibilityColorMode.Normal;
+        public int UIFontScalePercent { get; set; } = 100;
+        public int ChatLineSpacing { get; set; } = 0;
+        public bool ReduceScreenShake { get; set; }
+        public bool ReduceFlashEffects { get; set; }
+        public int AnimationIntensityPercent { get; set; } = 100;
+        public bool VisualCueForAudioEvents { get; set; }
+
         public bool EnabledCriminalActionQuery { get; set; } = true;
         public bool EnabledBeneficialCriminalActionQuery { get; set; } = false;
         public bool EnableStatReport { get; set; } = true;
@@ -234,6 +267,51 @@ namespace ClassicUO.Configuration
         public int ShowSkillsChangedDeltaValue { get; set; } = 1;
         public bool ShowStatsChangedMessage { get; set; } = true;
 
+        public byte GetEffectiveChatFont()
+        {
+            if (!AccessibilityEnabled)
+            {
+                return ChatFont;
+            }
+
+            int adjusted = ChatFont;
+
+            if (UIFontScalePercent >= 140)
+            {
+                adjusted += 2;
+            }
+            else if (UIFontScalePercent >= 115)
+            {
+                adjusted += 1;
+            }
+            else if (UIFontScalePercent <= 85)
+            {
+                adjusted -= 1;
+            }
+
+            return (byte) Math.Clamp(adjusted, 0, 20);
+        }
+
+        public void ClampAccessibilityValues()
+        {
+            UIFontScalePercent = Math.Clamp(UIFontScalePercent, MIN_UI_FONT_SCALE_PERCENT, MAX_UI_FONT_SCALE_PERCENT);
+            ChatLineSpacing = Math.Clamp(ChatLineSpacing, MIN_CHAT_LINE_SPACING, MAX_CHAT_LINE_SPACING);
+            AnimationIntensityPercent = Math.Clamp(AnimationIntensityPercent, MIN_ANIMATION_INTENSITY_PERCENT, MAX_ANIMATION_INTENSITY_PERCENT);
+        }
+
+        public void NormalizeAccessibilityEnums()
+        {
+            if (!Enum.IsDefined(typeof(AccessibilityPreset), AccessibilityPreset))
+            {
+                AccessibilityPreset = AccessibilityPreset.Default;
+            }
+
+            if (!Enum.IsDefined(typeof(AccessibilityColorMode), AccessibilityColorMode))
+            {
+                AccessibilityColorMode = AccessibilityColorMode.Normal;
+            }
+        }
+
 
         public bool ShadowsEnabled { get; set; } = true;
         public bool ShadowsStatics { get; set; } = true;
@@ -359,6 +437,9 @@ namespace ClassicUO.Configuration
         public void Save(World world, string path)
         {
             Log.Trace($"Saving path:\t\t{path}");
+
+            ClampAccessibilityValues();
+            NormalizeAccessibilityEnums();
 
             ProfileManager.Save(this, path);
 
