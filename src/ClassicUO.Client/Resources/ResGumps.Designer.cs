@@ -4608,7 +4608,6 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("AnimationIntensity", resourceCulture);
             }
         }
-
         /// <summary>
         ///   Looks up a localized string similar to Accessibility Preset.
         /// </summary>
