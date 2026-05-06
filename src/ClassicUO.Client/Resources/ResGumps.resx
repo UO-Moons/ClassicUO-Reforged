@@ -489,6 +489,15 @@
   <data name="WeatherEffects" xml:space="preserve">
     <value>Weather effects (Splash &amp; Ripples)</value>
   </data>
+  <data name="AccessibilityMode" xml:space="preserve">
+    <value>Accessibility Mode</value>
+  </data>
+  <data name="ReduceFlashEffects" xml:space="preserve">
+    <value>Reduce Flash Effects</value>
+  </data>
+  <data name="AnimationIntensity" xml:space="preserve">
+    <value>Animation Intensity</value>
+  </data>
   <data name="UseXBREffectBETA" xml:space="preserve">
     <value>Use xBR effect [BETA]</value>
   </data>

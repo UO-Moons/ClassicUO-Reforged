@@ -92,6 +92,9 @@ namespace ClassicUO.Configuration
             {
                 profile.WindowClientBounds = new Point(profile.WindowClientBounds.X, 480);
             }
+
+            profile.ClampAccessibilityValues();
+            profile.NormalizeAccessibilityEnums();
         }
 
         public static void UnLoadProfile()

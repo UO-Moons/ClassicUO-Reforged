@@ -170,7 +170,7 @@ namespace ClassicUO.Game.GameObjects
             AddMessage(
                 type,
                 message,
-                ProfileManager.CurrentProfile.ChatFont,
+                ProfileManager.CurrentProfile.GetEffectiveChatFont(),
                 ProfileManager.CurrentProfile.SpeechHue,
                 true,
                 text_type
