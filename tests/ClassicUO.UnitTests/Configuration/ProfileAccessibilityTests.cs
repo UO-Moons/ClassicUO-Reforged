@@ -37,4 +37,17 @@ public class ProfileAccessibilityTests
         profile.AccessibilityPreset.Should().Be(AccessibilityPreset.Default);
         profile.AccessibilityColorMode.Should().Be(AccessibilityColorMode.Normal);
     }
+
+    [Fact]
+    public void GetEffectiveChatFont_WhenAccessibilityEnabled_ShouldAdjustByUiFontScale()
+    {
+        var profile = new Profile
+        {
+            AccessibilityEnabled = true,
+            ChatFont = 1,
+            UIFontScalePercent = 140
+        };
+
+        profile.GetEffectiveChatFont().Should().Be(3);
+    }
 }

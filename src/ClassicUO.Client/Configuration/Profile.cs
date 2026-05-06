@@ -268,6 +268,31 @@ namespace ClassicUO.Configuration
         public int ShowSkillsChangedDeltaValue { get; set; } = 1;
         public bool ShowStatsChangedMessage { get; set; } = true;
 
+        public byte GetEffectiveChatFont()
+        {
+            if (!AccessibilityEnabled)
+            {
+                return ChatFont;
+            }
+
+            int adjusted = ChatFont;
+
+            if (UIFontScalePercent >= 140)
+            {
+                adjusted += 2;
+            }
+            else if (UIFontScalePercent >= 115)
+            {
+                adjusted += 1;
+            }
+            else if (UIFontScalePercent <= 85)
+            {
+                adjusted -= 1;
+            }
+
+            return (byte) Math.Clamp(adjusted, 0, 20);
+        }
+
         public void ClampAccessibilityValues()
         {
             UIFontScalePercent = Math.Clamp(UIFontScalePercent, MIN_UI_FONT_SCALE_PERCENT, MAX_UI_FONT_SCALE_PERCENT);

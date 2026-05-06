@@ -67,7 +67,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             TextBoxControl = new StbTextBox
             (
-                ProfileManager.CurrentProfile.ChatFont,
+                ProfileManager.CurrentProfile.GetEffectiveChatFont(),
                 TEXTBOX_LENGTH,
                 Width,
                 true,
