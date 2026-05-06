@@ -96,6 +96,9 @@ namespace ClassicUO.Configuration
 
             profile.ClampAccessibilityValues();
             profile.NormalizeAccessibilityEnums();
+
+            profile.ClampAccessibilityValues();
+            profile.NormalizeAccessibilityEnums();
             profile.ClampAccessibilityValues();
             profile.NormalizeAccessibilityEnums();
             profile.UIFontScalePercent = Math.Clamp(profile.UIFontScalePercent, 80, 200);

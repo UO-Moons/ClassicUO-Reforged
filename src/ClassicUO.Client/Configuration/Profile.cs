@@ -132,6 +132,7 @@ namespace ClassicUO.Configuration
         public AccessibilityColorMode AccessibilityColorMode { get; set; } = AccessibilityColorMode.Normal;
         public int AccessibilityPreset { get; set; } // 0 = default, 1 = high contrast, 2 = low motion, 3 = readability
         public int AccessibilityColorMode { get; set; } // 0 = normal, 1 = protanopia, 2 = deuteranopia, 3 = tritanopia
+
         public int UIFontScalePercent { get; set; } = 100;
         public int ChatLineSpacing { get; set; } = 0;
         public bool ReduceScreenShake { get; set; }
@@ -414,6 +415,9 @@ namespace ClassicUO.Configuration
         public void Save(World world, string path)
         {
             Log.Trace($"Saving path:\t\t{path}");
+
+            ClampAccessibilityValues();
+            NormalizeAccessibilityEnums();
 
             ProfileManager.Save(this, path);
 
