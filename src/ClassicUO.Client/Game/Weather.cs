@@ -251,6 +251,7 @@ namespace ClassicUO.Game
             _windTimer = _timer = 0;
             CurrentWeather = null;
             StopRainSound();
+            _world.PuddleEffect.Reset();
         }
 
         public void Generate(WeatherType type, byte count, byte temp)
@@ -1090,6 +1091,8 @@ namespace ClassicUO.Game
                                             CreateSplash(ref effect, effect.WorldX, effect.WorldY);
                                         }
 
+                                        _world.PuddleEffect.AddRainHit(effect.WorldX, effect.WorldY);
+
                                         // Trigger ripple effect if rain hits water tile (only once per particle)
                                         if (!effect.RippleCreated)
                                         {
@@ -1667,6 +1670,10 @@ namespace ClassicUO.Game
 
                 _world.RippleEffect.Update(deltaTime, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
                 _world.RippleEffect.Draw(batcher, layerDepth);
+
+                bool isRaining = Type == WeatherType.WT_RAIN || Type == WeatherType.WT_STORM_APPROACH;
+                _world.PuddleEffect.Update(deltaTime, isRaining, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
+                _world.PuddleEffect.Draw(batcher, layerDepth);
             }
 
             _lastTick = Time.Ticks;
