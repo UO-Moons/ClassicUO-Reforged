@@ -4581,6 +4581,33 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("WeatherEffects", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Accessibility Mode.
+        /// </summary>
+        public static string AccessibilityMode {
+            get {
+                return ResourceManager.GetString("AccessibilityMode", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reduce Flash Effects.
+        /// </summary>
+        public static string ReduceFlashEffects {
+            get {
+                return ResourceManager.GetString("ReduceFlashEffects", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Animation Intensity.
+        /// </summary>
+        public static string AnimationIntensity {
+            get {
+                return ResourceManager.GetString("AnimationIntensity", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to [Whisper]: .
