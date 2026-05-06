@@ -35,6 +35,11 @@ namespace ClassicUO.Game.UI.Gumps
         private Label _titleLabel;
         private GumpPic _virtueMenuPic;
         private Button _warModeBtn;
+        private float _currentScale = 1f;
+        private float _appliedScale = 1f;
+        private const float MIN_SCALE = 0.80f;
+        private const float MAX_SCALE = 1.50f;
+        private const float SCALE_STEP = 0.05f;
 
         public PaperDollGump(World world) : base(world, 0, 0)
         {
@@ -317,6 +322,7 @@ namespace ClassicUO.Game.UI.Gumps
             Add(_titleLabel);
 
             RequestUpdateContents();
+            ApplyScale();
         }
 
         private void _picBase_MouseDoubleClick(object sender, MouseDoubleClickEventArgs e)
@@ -526,6 +532,7 @@ namespace ClassicUO.Game.UI.Gumps
             base.Save(writer);
 
             writer.WriteAttributeString("isminimized", IsMinimized.ToString());
+            writer.WriteAttributeString("scale", _currentScale.ToString(System.Globalization.CultureInfo.InvariantCulture));
         }
 
         public override void Restore(XmlElement xml)
@@ -540,10 +547,72 @@ namespace ClassicUO.Game.UI.Gumps
                 Client.Game.GetScene<GameScene>()?.DoubleClickDelayed(LocalSerial);
 
                 IsMinimized = bool.Parse(xml.GetAttribute("isminimized"));
+                if (float.TryParse(xml.GetAttribute("scale"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var scale))
+                {
+                    _currentScale = MathHelper.Clamp(scale, MIN_SCALE, MAX_SCALE);
+                    ApplyScale();
+                }
             }
             else
             {
                 Dispose();
+            }
+        }
+
+        protected override void OnMouseWheel(MouseEventType delta)
+        {
+            if (IsMinimized || !Keyboard.Ctrl)
+            {
+                base.OnMouseWheel(delta);
+                return;
+            }
+
+            float oldScale = _currentScale;
+            if (delta == MouseEventType.WheelScrollUp)
+            {
+                _currentScale = MathHelper.Clamp(_currentScale + SCALE_STEP, MIN_SCALE, MAX_SCALE);
+            }
+            else if (delta == MouseEventType.WheelScrollDown)
+            {
+                _currentScale = MathHelper.Clamp(_currentScale - SCALE_STEP, MIN_SCALE, MAX_SCALE);
+            }
+
+            if (!MathHelper.WithinEpsilon(oldScale, _currentScale))
+            {
+                ApplyScale();
+                return;
+            }
+
+            base.OnMouseWheel(delta);
+        }
+
+        private void ApplyScale()
+        {
+            float ratio = _currentScale / _appliedScale;
+
+            if (MathHelper.WithinEpsilon(ratio, 1f))
+            {
+                return;
+            }
+
+            foreach (Control child in Children)
+            {
+                ScaleControl(child, ratio);
+            }
+
+            _appliedScale = _currentScale;
+        }
+
+        private static void ScaleControl(Control control, float scale)
+        {
+            control.X = (int)Math.Round(control.X * scale);
+            control.Y = (int)Math.Round(control.Y * scale);
+            control.Width = (int)Math.Round(control.Width * scale);
+            control.Height = (int)Math.Round(control.Height * scale);
+
+            foreach (Control child in control.Children)
+            {
+                ScaleControl(child, scale);
             }
         }
 
