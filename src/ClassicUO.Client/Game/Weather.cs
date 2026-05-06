@@ -367,7 +367,7 @@ namespace ClassicUO.Game
 
             _windTimer = 0;
 
-            ScaledCount = CalculateScaledCount(Count);
+            ScaledCount = CalculateScaledCount(Count, GetAccessibilityWeatherIntensityScale());
             CurrentCount = ScaledCount;
 
             // Calculate player's absolute isometric pixel coordinates from tile coordinates
@@ -434,14 +434,32 @@ namespace ClassicUO.Game
             }
         }
 
-        private static byte CalculateScaledCount(byte count)
+        private static byte CalculateScaledCount(byte count, float accessibilityIntensityScale = 1.0f)
         {
             if (count <= 0)
             {
                 return 0;
             }
+
+            accessibilityIntensityScale = Math.Clamp(accessibilityIntensityScale, 0.0f, 1.0f);
+
             float legacyWindowSize = 640 * 480;
-            return (byte)Math.Max(1, Math.Min(byte.MaxValue, count * (Client.Game.Scene.Camera.Bounds.Width * Client.Game.Scene.Camera.Bounds.Height) / legacyWindowSize));
+            float scaledCount = count * (Client.Game.Scene.Camera.Bounds.Width * Client.Game.Scene.Camera.Bounds.Height) / legacyWindowSize;
+            scaledCount *= accessibilityIntensityScale;
+
+            return (byte)Math.Max(1, Math.Min(byte.MaxValue, scaledCount));
+        }
+
+        private static float GetAccessibilityWeatherIntensityScale()
+        {
+            Profile profile = ProfileManager.CurrentProfile;
+
+            if (profile == null || !profile.AccessibilityEnabled)
+            {
+                return 1.0f;
+            }
+
+            return profile.AnimationIntensityPercent / 100.0f;
         }
 
         private enum RainRenderStyle
@@ -777,7 +795,7 @@ namespace ClassicUO.Game
             }
 
             //Rescale the count if window size has changed
-            byte newScaledCount = CalculateScaledCount(Count);
+            byte newScaledCount = CalculateScaledCount(Count, GetAccessibilityWeatherIntensityScale());
 
             if (newScaledCount != ScaledCount)
             {
