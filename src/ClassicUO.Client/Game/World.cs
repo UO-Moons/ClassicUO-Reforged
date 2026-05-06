@@ -50,6 +50,7 @@ namespace ClassicUO.Game
             Weather = new Weather(this);
             RippleEffect = new RippleEffect(this);
             SplashEffect = new SplashEffect();
+            PuddleEffect = new PuddleEffect();
             InfoBars = new InfoBarManager(this);
         }
 
@@ -104,6 +105,8 @@ namespace ClassicUO.Game
         public RippleEffect RippleEffect { get; }
 
         public SplashEffect SplashEffect { get; }
+
+        public PuddleEffect PuddleEffect { get; }
 
         public InfoBarManager InfoBars { get; }
 
