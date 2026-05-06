@@ -95,6 +95,21 @@ namespace ClassicUO.Configuration
 
             profile.ClampAccessibilityValues();
             profile.NormalizeAccessibilityEnums();
+
+            profile.UIFontScalePercent = Math.Clamp(profile.UIFontScalePercent, 80, 200);
+            profile.ChatLineSpacing = Math.Clamp(profile.ChatLineSpacing, 0, 20);
+            profile.AnimationIntensityPercent = Math.Clamp(profile.AnimationIntensityPercent, 0, 100);
+
+            if (!Enum.IsDefined(typeof(AccessibilityPreset), profile.AccessibilityPreset))
+            {
+                profile.AccessibilityPreset = AccessibilityPreset.Default;
+            }
+
+            if (!Enum.IsDefined(typeof(AccessibilityColorMode), profile.AccessibilityColorMode))
+            {
+                profile.AccessibilityColorMode = AccessibilityColorMode.Normal;
+            }
+
         }
 
         public static void UnLoadProfile()
