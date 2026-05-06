@@ -4164,8 +4164,18 @@ namespace ClassicUO.Game.UI.Gumps
             _currentProfile.AnimatedWaterEffect = _animatedWaterEffect.IsChecked;
             _currentProfile.EnableWeatherEffects = _weatherEffects.IsChecked;
             _currentProfile.AccessibilityEnabled = _accessibilityEnabled.IsChecked;
-            _currentProfile.ReduceFlashEffects = _reduceFlashEffects.IsChecked;
-            _currentProfile.AnimationIntensityPercent = _accessibilityAnimationIntensity.Value;
+
+            if (_currentProfile.AccessibilityEnabled)
+            {
+                _currentProfile.ReduceFlashEffects = _reduceFlashEffects.IsChecked;
+                _currentProfile.AnimationIntensityPercent = _accessibilityAnimationIntensity.Value;
+            }
+            else
+            {
+                _currentProfile.ReduceFlashEffects = false;
+                _currentProfile.AnimationIntensityPercent = 100;
+            }
+
             _currentProfile.PartyAura = _partyAura.IsChecked;
             _currentProfile.PartyAuraHue = _partyAuraColorPickerBox.Hue;
             _currentProfile.HideChatGradient = _hideChatGradient.IsChecked;
