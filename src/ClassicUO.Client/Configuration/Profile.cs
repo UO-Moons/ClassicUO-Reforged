@@ -19,6 +19,22 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Configuration
 {
+    internal enum AccessibilityPreset
+    {
+        Default = 0,
+        HighContrast = 1,
+        LowMotion = 2,
+        Readability = 3
+    }
+
+    internal enum AccessibilityColorMode
+    {
+        Normal = 0,
+        Protanopia = 1,
+        Deuteranopia = 2,
+        Tritanopia = 3
+    }
+
     //[JsonSourceGenerationOptions(WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.Unspecified)]
     [JsonSerializable(typeof(GlobalProfile), GenerationMode = JsonSourceGenerationMode.Metadata)]
     [JsonSerializable(typeof(Profile), GenerationMode = JsonSourceGenerationMode.Metadata)]
