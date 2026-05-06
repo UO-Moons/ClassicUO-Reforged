@@ -3683,7 +3683,7 @@ namespace ClassicUO.Network
                 name,
                 hue,
                 type,
-                ProfileManager.CurrentProfile.ChatFont,
+                ProfileManager.CurrentProfile.GetEffectiveChatFont(),
                 text_type,
                 true,
                 lang

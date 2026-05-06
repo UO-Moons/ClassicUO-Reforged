@@ -144,6 +144,9 @@ namespace ClassicUO.Game.UI.Gumps
 
         // video
         private Checkbox _use_old_status_gump, _statusGumpBarMutuallyExclusive, _windowBorderless, _enableDeathScreen, _enableBlackWhiteEffect, _altLights, _enableLight, _enableShadows, _enableShadowsStatics, _auraMouse, _runMouseInSeparateThread, _useColoredLights, _darkNights, _partyAura, _hideChatGradient, _animatedWaterEffect, _weatherEffects;
+        private Checkbox _accessibilityEnabled, _reduceFlashEffects;
+        private HSliderBar _accessibilityAnimationIntensity;
+        private Combobox _accessibilityPreset;
         private Combobox _lightLevelType;
         private Checkbox _use_smooth_boat_movement;
         private HSliderBar _terrainShadowLevel;
@@ -1942,6 +1945,18 @@ namespace ClassicUO.Game.UI.Gumps
                     startY
                 )
             );
+
+            startY += 25;
+            section4.Add(_accessibilityEnabled = AddCheckBox(null, ResGumps.AccessibilityMode, _currentProfile.AccessibilityEnabled, startX, startY));
+            section4.AddRight(_reduceFlashEffects = AddCheckBox(null, ResGumps.ReduceFlashEffects, _currentProfile.ReduceFlashEffects, startX, startY));
+
+            startY += 25;
+            section4.Add(AddLabel(null, ResGumps.AccessibilityPreset, startX, startY));
+            section4.AddRight(_accessibilityPreset = AddCombobox(null, 150, new[] { "Default", "High Contrast", "Low Motion", "Readability" }, (int)_currentProfile.AccessibilityPreset, startX, startY));
+
+            startY += 25;
+            section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
+            section4.AddRight(_accessibilityAnimationIntensity = AddHSlider(null, 0, 100, _currentProfile.AnimationIntensityPercent, startX, startY, 200));
 
 
             SettingsSection section5 = AddSettingsSection(box, "Shadows");
@@ -4153,6 +4168,20 @@ namespace ClassicUO.Game.UI.Gumps
             _currentProfile.AuraOnMouse = _auraMouse.IsChecked;
             _currentProfile.AnimatedWaterEffect = _animatedWaterEffect.IsChecked;
             _currentProfile.EnableWeatherEffects = _weatherEffects.IsChecked;
+            _currentProfile.AccessibilityEnabled = _accessibilityEnabled.IsChecked;
+            _currentProfile.AccessibilityPreset = (AccessibilityPreset) _accessibilityPreset.SelectedIndex;
+
+            if (_currentProfile.AccessibilityEnabled)
+            {
+                _currentProfile.ReduceFlashEffects = _reduceFlashEffects.IsChecked;
+                _currentProfile.AnimationIntensityPercent = _accessibilityAnimationIntensity.Value;
+            }
+            else
+            {
+                _currentProfile.ReduceFlashEffects = false;
+                _currentProfile.AnimationIntensityPercent = 100;
+            }
+
             _currentProfile.PartyAura = _partyAura.IsChecked;
             _currentProfile.PartyAuraHue = _partyAuraColorPickerBox.Hue;
             _currentProfile.HideChatGradient = _hideChatGradient.IsChecked;
