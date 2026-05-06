@@ -144,6 +144,8 @@ namespace ClassicUO.Game.UI.Gumps
 
         // video
         private Checkbox _use_old_status_gump, _statusGumpBarMutuallyExclusive, _windowBorderless, _enableDeathScreen, _enableBlackWhiteEffect, _altLights, _enableLight, _enableShadows, _enableShadowsStatics, _auraMouse, _runMouseInSeparateThread, _useColoredLights, _darkNights, _partyAura, _hideChatGradient, _animatedWaterEffect, _weatherEffects;
+        private Checkbox _accessibilityEnabled, _reduceFlashEffects;
+        private HSliderBar _accessibilityAnimationIntensity;
         private Combobox _lightLevelType;
         private Checkbox _use_smooth_boat_movement;
         private HSliderBar _terrainShadowLevel;
@@ -1942,6 +1944,14 @@ namespace ClassicUO.Game.UI.Gumps
                     startY
                 )
             );
+
+            startY += 25;
+            section4.Add(_accessibilityEnabled = AddCheckBox(null, "Accessibility Mode", _currentProfile.AccessibilityEnabled, startX, startY));
+            section4.AddRight(_reduceFlashEffects = AddCheckBox(null, "Reduce Flash Effects", _currentProfile.ReduceFlashEffects, startX, startY));
+
+            startY += 25;
+            section4.Add(AddLabel(null, "Animation Intensity", startX, startY));
+            section4.AddRight(_accessibilityAnimationIntensity = AddHSlider(null, 0, 100, _currentProfile.AnimationIntensityPercent, startX, startY, 200));
 
 
             SettingsSection section5 = AddSettingsSection(box, "Shadows");
@@ -4153,6 +4163,9 @@ namespace ClassicUO.Game.UI.Gumps
             _currentProfile.AuraOnMouse = _auraMouse.IsChecked;
             _currentProfile.AnimatedWaterEffect = _animatedWaterEffect.IsChecked;
             _currentProfile.EnableWeatherEffects = _weatherEffects.IsChecked;
+            _currentProfile.AccessibilityEnabled = _accessibilityEnabled.IsChecked;
+            _currentProfile.ReduceFlashEffects = _reduceFlashEffects.IsChecked;
+            _currentProfile.AnimationIntensityPercent = _accessibilityAnimationIntensity.Value;
             _currentProfile.PartyAura = _partyAura.IsChecked;
             _currentProfile.PartyAuraHue = _partyAuraColorPickerBox.Hue;
             _currentProfile.HideChatGradient = _hideChatGradient.IsChecked;
