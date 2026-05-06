@@ -70,6 +70,13 @@ namespace ClassicUO.Configuration
 
     internal sealed class Profile
     {
+        public const int MIN_UI_FONT_SCALE_PERCENT = 80;
+        public const int MAX_UI_FONT_SCALE_PERCENT = 200;
+        public const int MIN_CHAT_LINE_SPACING = 0;
+        public const int MAX_CHAT_LINE_SPACING = 20;
+        public const int MIN_ANIMATION_INTENSITY_PERCENT = 0;
+        public const int MAX_ANIMATION_INTENSITY_PERCENT = 100;
+
         [JsonIgnore] public string Username { get; set; }
         [JsonIgnore] public string ServerName { get; set; }
         [JsonIgnore] public string CharacterName { get; set; }
@@ -121,6 +128,8 @@ namespace ClassicUO.Configuration
 
         // visual
         public bool AccessibilityEnabled { get; set; }
+        public AccessibilityPreset AccessibilityPreset { get; set; } = AccessibilityPreset.Default;
+        public AccessibilityColorMode AccessibilityColorMode { get; set; } = AccessibilityColorMode.Normal;
         public int AccessibilityPreset { get; set; } // 0 = default, 1 = high contrast, 2 = low motion, 3 = readability
         public int AccessibilityColorMode { get; set; } // 0 = normal, 1 = protanopia, 2 = deuteranopia, 3 = tritanopia
         public int UIFontScalePercent { get; set; } = 100;
@@ -259,6 +268,26 @@ namespace ClassicUO.Configuration
         public bool ShowSkillsChangedMessage { get; set; } = true;
         public int ShowSkillsChangedDeltaValue { get; set; } = 1;
         public bool ShowStatsChangedMessage { get; set; } = true;
+
+        public void ClampAccessibilityValues()
+        {
+            UIFontScalePercent = Math.Clamp(UIFontScalePercent, MIN_UI_FONT_SCALE_PERCENT, MAX_UI_FONT_SCALE_PERCENT);
+            ChatLineSpacing = Math.Clamp(ChatLineSpacing, MIN_CHAT_LINE_SPACING, MAX_CHAT_LINE_SPACING);
+            AnimationIntensityPercent = Math.Clamp(AnimationIntensityPercent, MIN_ANIMATION_INTENSITY_PERCENT, MAX_ANIMATION_INTENSITY_PERCENT);
+        }
+
+        public void NormalizeAccessibilityEnums()
+        {
+            if (!Enum.IsDefined(typeof(AccessibilityPreset), AccessibilityPreset))
+            {
+                AccessibilityPreset = AccessibilityPreset.Default;
+            }
+
+            if (!Enum.IsDefined(typeof(AccessibilityColorMode), AccessibilityColorMode))
+            {
+                AccessibilityColorMode = AccessibilityColorMode.Normal;
+            }
+        }
 
 
         public bool ShadowsEnabled { get; set; } = true;
