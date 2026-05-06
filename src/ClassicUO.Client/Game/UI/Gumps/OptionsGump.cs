@@ -147,6 +147,10 @@ namespace ClassicUO.Game.UI.Gumps
         private Checkbox _accessibilityEnabled, _reduceFlashEffects;
         private HSliderBar _accessibilityAnimationIntensity;
         private Combobox _accessibilityPreset;
+
+
+
+
         private Combobox _lightLevelType;
         private Checkbox _use_smooth_boat_movement;
         private HSliderBar _terrainShadowLevel;
@@ -1951,11 +1955,30 @@ namespace ClassicUO.Game.UI.Gumps
             section4.AddRight(_reduceFlashEffects = AddCheckBox(null, ResGumps.ReduceFlashEffects, _currentProfile.ReduceFlashEffects, startX, startY));
 
             startY += 25;
+
             section4.Add(AddLabel(null, ResGumps.AccessibilityPreset, startX, startY));
             section4.AddRight(_accessibilityPreset = AddCombobox(null, 150, new[] { "Default", "High Contrast", "Low Motion", "Readability" }, (int)_currentProfile.AccessibilityPreset, startX, startY));
 
             startY += 25;
             section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
+
+
+            section4.Add(AddLabel(null, ResGumps.AccessibilityPreset, startX, startY));
+            section4.AddRight(_accessibilityPreset = AddCombobox(null, 150, ["Default", "High Contrast", "Low Motion", "Readability"], (int)_currentProfile.AccessibilityPreset, startX, startY));
+
+            startY += 25;
+            section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
+
+            section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
+
+            
+            section4.Add(_accessibilityEnabled = AddCheckBox(null, "Accessibility Mode", _currentProfile.AccessibilityEnabled, startX, startY));
+            section4.AddRight(_reduceFlashEffects = AddCheckBox(null, "Reduce Flash Effects", _currentProfile.ReduceFlashEffects, startX, startY));
+
+            startY += 25;
+            section4.Add(AddLabel(null, "Animation Intensity", startX, startY));
+
+
             section4.AddRight(_accessibilityAnimationIntensity = AddHSlider(null, 0, 100, _currentProfile.AnimationIntensityPercent, startX, startY, 200));
 
 
@@ -4169,6 +4192,10 @@ namespace ClassicUO.Game.UI.Gumps
             _currentProfile.AnimatedWaterEffect = _animatedWaterEffect.IsChecked;
             _currentProfile.EnableWeatherEffects = _weatherEffects.IsChecked;
             _currentProfile.AccessibilityEnabled = _accessibilityEnabled.IsChecked;
+
+
+
+
             _currentProfile.AccessibilityPreset = (AccessibilityPreset) _accessibilityPreset.SelectedIndex;
 
             if (_currentProfile.AccessibilityEnabled)
@@ -4181,6 +4208,13 @@ namespace ClassicUO.Game.UI.Gumps
                 _currentProfile.ReduceFlashEffects = false;
                 _currentProfile.AnimationIntensityPercent = 100;
             }
+
+
+
+            _currentProfile.ReduceFlashEffects = _reduceFlashEffects.IsChecked;
+            _currentProfile.AnimationIntensityPercent = _accessibilityAnimationIntensity.Value;
+
+
 
             _currentProfile.PartyAura = _partyAura.IsChecked;
             _currentProfile.PartyAuraHue = _partyAuraColorPickerBox.Hue;

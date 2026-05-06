@@ -130,6 +130,7 @@ namespace ClassicUO.Configuration
         public bool AccessibilityEnabled { get; set; }
         public AccessibilityPreset AccessibilityPreset { get; set; } = AccessibilityPreset.Default;
         public AccessibilityColorMode AccessibilityColorMode { get; set; } = AccessibilityColorMode.Normal;
+
         public int UIFontScalePercent { get; set; } = 100;
         public int ChatLineSpacing { get; set; } = 0;
         public bool ReduceScreenShake { get; set; }
