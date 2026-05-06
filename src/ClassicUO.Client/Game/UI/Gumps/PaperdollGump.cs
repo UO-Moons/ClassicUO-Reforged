@@ -549,7 +549,7 @@ namespace ClassicUO.Game.UI.Gumps
                 IsMinimized = bool.Parse(xml.GetAttribute("isminimized"));
                 if (float.TryParse(xml.GetAttribute("scale"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var scale))
                 {
-                    _currentScale = MathHelper.Clamp(scale, MIN_SCALE, MAX_SCALE);
+                    _currentScale = Microsoft.Xna.Framework.MathHelper.Clamp(scale, MIN_SCALE, MAX_SCALE);
                     ApplyScale();
                 }
             }
@@ -559,30 +559,38 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        protected override bool OnMouseWheel(int x, int y, MouseButtonType button, sbyte delta)
+        protected override void OnMouseWheel(MouseEventType delta)
         {
             if (IsMinimized || !Keyboard.Ctrl)
             {
-                return base.OnMouseWheel(x, y, button, delta);
+                base.OnMouseWheel(delta);
+                return;
             }
 
             float oldScale = _currentScale;
-            _currentScale = MathHelper.Clamp(_currentScale + (delta > 0 ? SCALE_STEP : -SCALE_STEP), MIN_SCALE, MAX_SCALE);
-
-            if (!MathHelper.WithinEpsilon(oldScale, _currentScale))
+            if (delta == MouseEventType.WheelScrollUp)
             {
-                ApplyScale();
-                return true;
+                _currentScale = Microsoft.Xna.Framework.MathHelper.Clamp(_currentScale + SCALE_STEP, MIN_SCALE, MAX_SCALE);
+            }
+            else if (delta == MouseEventType.WheelScrollDown)
+            {
+                _currentScale = Microsoft.Xna.Framework.MathHelper.Clamp(_currentScale - SCALE_STEP, MIN_SCALE, MAX_SCALE);
             }
 
-            return base.OnMouseWheel(x, y, button, delta);
+            if (Math.Abs(oldScale - _currentScale) > 0.0001f)
+            {
+                ApplyScale();
+                return;
+            }
+
+            base.OnMouseWheel(delta);
         }
 
         private void ApplyScale()
         {
             float ratio = _currentScale / _appliedScale;
 
-            if (MathHelper.WithinEpsilon(ratio, 1f))
+            if (Math.Abs(ratio - 1f) <= 0.0001f)
             {
                 return;
             }
