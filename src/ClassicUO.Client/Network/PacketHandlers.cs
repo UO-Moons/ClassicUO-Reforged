@@ -5650,7 +5650,6 @@ namespace ClassicUO.Network
             }
         }
 
-
         private const uint KNOWN_ASSISTANT_FEATURE_MASK =
             (uint)(AssistantFeatureFlags.FilterWeather
             | AssistantFeatureFlags.FilterLight
@@ -5698,6 +5697,7 @@ namespace ClassicUO.Network
 
             return (AssistantFeatureFlags)best;
         }
+
         private static void DisplayWaypoint(World world, ref StackDataReader p)
         {
             uint serial = p.ReadUInt32BE();
