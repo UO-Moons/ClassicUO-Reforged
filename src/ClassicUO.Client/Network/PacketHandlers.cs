@@ -5729,9 +5729,8 @@ namespace ClassicUO.Network
                         world.WMapManager.SetACKReceived();
                         world.WMapManager.SetEnable(true);
 
-                        break;
                     }
-
+                    break;
                 case 0x01: // guild track info (UOX3) / party track info (legacy)
                 case 0x02: // guild track info (legacy)
                     // Legacy format always includes party locations, guild can toggle location/hits payload.
