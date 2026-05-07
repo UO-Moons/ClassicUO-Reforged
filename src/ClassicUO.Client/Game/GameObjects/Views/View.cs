@@ -225,7 +225,8 @@ namespace ClassicUO.Game.GameObjects
             Vector3 hue,
             bool shadow,
             float depth,
-            bool isWet = false
+            bool isWet = false,
+            uint animationSeed = 0
         )
         {
             ref UOFileIndex index = ref Client.Game.UO.FileManager.Arts.File.GetValidRefEntry(graphic + 0x4000);
@@ -265,9 +266,33 @@ namespace ClassicUO.Game.GameObjects
                         depth + 0.5f
                     );
 
-                    var sin = (float)Math.Sin(Time.Ticks / 1000f);
-                    var cos = (float)Math.Cos(Time.Ticks / 1000f);
-                    scale = new Vector2(1.1f + sin * 0.1f, 1.1f + cos * 0.5f * 0.1f);
+                    float globalTime = Time.Ticks / 1000f;
+
+                    if (animationSeed != 0)
+                    {
+                        // Shared wind gust cycle for foliage with delayed start/stop per tile.
+                        float offset = (animationSeed & 0xFF) / 255f * 0.8f;
+                        float localWindTime = globalTime - offset;
+
+                        const float gustPeriod = 14f;
+                        float gustWave = 0.5f + 0.5f * (float)Math.Sin((localWindTime / gustPeriod) * MathHelper.TwoPi);
+
+                        float weatherSway = Weather.FoliageSwayIntensity;
+                        float gustStrength = Math.Clamp(0.35f + gustWave * 0.65f, 0f, 1f) * weatherSway;
+
+                        float baseSway = (float)Math.Sin(globalTime * (1.25f + weatherSway * 0.55f));
+                        float crossSway = (float)Math.Cos(globalTime * (0.95f + weatherSway * 0.4f));
+                        float swayX = baseSway * 0.08f * gustStrength;
+                        float swayY = crossSway * 0.035f * gustStrength;
+                        scale = new Vector2(1.1f + swayX, 1.1f + swayY);
+                    }
+                    else
+                    {
+                        // Preserve existing water animation behavior.
+                        var sin = (float)Math.Sin(globalTime);
+                        var cos = (float)Math.Cos(globalTime);
+                        scale = new Vector2(1.1f + sin * 0.1f, 1.1f + cos * 0.5f * 0.1f);
+                    }
                 }
 
                 batcher.Draw(
