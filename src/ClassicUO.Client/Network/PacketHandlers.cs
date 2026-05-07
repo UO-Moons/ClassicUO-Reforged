@@ -5599,6 +5599,57 @@ namespace ClassicUO.Network
 
         private static void KREncryptionResponse(World world, ref StackDataReader p) { }
 
+        [Flags]
+        private enum AssistantFeatureFlags : uint
+        {
+            FilterWeather = 1 << 0,
+            FilterLight = 1 << 1,
+            AutoOpenDoors = 1 << 4,
+            OverheadHealth = 1 << 16,
+            FilterSeason = 1 << 23
+        }
+
+        private static void ApplyAssistantFeatureRestrictions(AssistantFeatureFlags disabledFlags)
+        {
+            AssistantFeatureRestrictionState.DisableWeatherFilter = disabledFlags.HasFlag(AssistantFeatureFlags.FilterWeather);
+            AssistantFeatureRestrictionState.DisableLightFilter = disabledFlags.HasFlag(AssistantFeatureFlags.FilterLight);
+            AssistantFeatureRestrictionState.DisableSeasonFilter = disabledFlags.HasFlag(AssistantFeatureFlags.FilterSeason);
+            AssistantFeatureRestrictionState.DisableAutoOpenDoors = disabledFlags.HasFlag(AssistantFeatureFlags.AutoOpenDoors);
+            AssistantFeatureRestrictionState.DisableOverheadHealth = disabledFlags.HasFlag(AssistantFeatureFlags.OverheadHealth);
+
+            if (ProfileManager.CurrentProfile == null)
+            {
+                return;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableWeatherFilter)
+            {
+                ProfileManager.CurrentProfile.EnableWeatherEffects = true;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableLightFilter)
+            {
+                ProfileManager.CurrentProfile.UseCustomLightLevel = false;
+                ProfileManager.CurrentProfile.UseDarkNights = false;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableSeasonFilter)
+            {
+                ProfileManager.CurrentProfile.TreeToStumps = false;
+                ProfileManager.CurrentProfile.HideVegetation = false;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableAutoOpenDoors)
+            {
+                ProfileManager.CurrentProfile.AutoOpenDoors = false;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableOverheadHealth)
+            {
+                ProfileManager.CurrentProfile.ShowMobilesHP = false;
+            }
+        }
+
         private static void DisplayWaypoint(World world, ref StackDataReader p)
         {
             uint serial = p.ReadUInt32BE();
@@ -5623,16 +5674,23 @@ namespace ClassicUO.Network
 
             switch (type)
             {
-                case 0x00: // accepted
-                    Log.Trace("Krrios special packet accepted");
-                    world.WMapManager.SetACKReceived();
-                    world.WMapManager.SetEnable(true);
+                case 0x00: // accepted or party track info (UOX3)
+                    if (p.Remaining == 0)
+                    {
+                        Log.Trace("Krrios special packet accepted");
+                        world.WMapManager.SetACKReceived();
+                        world.WMapManager.SetEnable(true);
 
-                    break;
+                        break;
+                    }
 
-                case 0x01: // custom party info
-                case 0x02: // guild track info
-                    bool locations = type == 0x01 || p.ReadBool();
+                case 0x01: // guild track info (UOX3) / party track info (legacy)
+                case 0x02: // guild track info (legacy)
+                    // Legacy format always includes party locations, guild can toggle location/hits payload.
+                    // UOX3 format sends 0x00 for party and 0x01 for guild; both include location payload.
+                    bool isUox3Format = type <= 0x01;
+                    bool isGuild = type == 0x02 || (isUox3Format && type == 0x01);
+                    bool locations = isUox3Format || p.ReadBool();
 
                     uint serial;
 
@@ -5643,18 +5701,9 @@ namespace ClassicUO.Network
                             ushort x = p.ReadUInt16BE();
                             ushort y = p.ReadUInt16BE();
                             byte map = p.ReadUInt8();
-                            int hits = type == 1 ? 0 : p.ReadUInt8();
+                            int hits = isGuild && !isUox3Format ? p.ReadUInt8() : 0;
 
-                            world.WMapManager.AddOrUpdate(
-                                serial,
-                                x,
-                                y,
-                                hits,
-                                map,
-                                type == 0x02,
-                                null,
-                                true
-                            );
+                            world.WMapManager.AddOrUpdate(serial, x, y, hits, map, isGuild, null, true);
                         }
                     }
 
@@ -5672,6 +5721,12 @@ namespace ClassicUO.Network
                     break;
 
                 case 0xFE:
+                    if (p.Remaining >= 4)
+                    {
+                        AssistantFeatureFlags disabledFlags = (AssistantFeatureFlags)p.ReadUInt32BE();
+                        ApplyAssistantFeatureRestrictions(disabledFlags);
+                        Log.Info($"Assistant restrictions applied: 0x{(uint)disabledFlags:X8}");
+                    }
 
                     Client.Game.EnqueueAction(5000, () =>
                     {

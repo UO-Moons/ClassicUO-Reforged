@@ -427,8 +427,47 @@ namespace ClassicUO.Game.UI.Gumps
             BuildInfoBar();
             BuildContainers();
             BuildExperimental();
+            ApplyServerAssistantLocks();
 
             ChangePage(1);
+        }
+
+
+        private void ApplyServerAssistantLocks()
+        {
+            if (AssistantFeatureRestrictionState.DisableSeasonFilter)
+            {
+                _treeToStumps.IsChecked = false;
+                _treeToStumps.IsEnabled = false;
+                _hideVegetation.IsChecked = false;
+                _hideVegetation.IsEnabled = false;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableWeatherFilter)
+            {
+                _weatherEffects.IsChecked = true;
+                _weatherEffects.IsEnabled = false;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableLightFilter)
+            {
+                _enableLight.IsChecked = false;
+                _enableLight.IsEnabled = false;
+                _darkNights.IsChecked = false;
+                _darkNights.IsEnabled = false;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableAutoOpenDoors)
+            {
+                _autoOpenDoors.IsChecked = false;
+                _autoOpenDoors.IsEnabled = false;
+            }
+
+            if (AssistantFeatureRestrictionState.DisableOverheadHealth)
+            {
+                _showHpMobile.IsChecked = false;
+                _showHpMobile.IsEnabled = false;
+            }
         }
 
         private static Texture2D LogoTexture
