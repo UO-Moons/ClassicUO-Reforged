@@ -17,16 +17,14 @@ namespace ClassicUO.Game.Managers
                 prop = new ItemProperty();
                 _itemsProperties[serial] = prop;
             }
-            else
-            {
-
-            }
 
             prop.Serial = serial;
             prop.Revision = revision;
             prop.Name = name;
             prop.Data = data;
             prop.NameCliloc = namecliloc;
+
+            Client.Game.UO.World?.DurabilityManager?.UpdateItem(serial);
         }
 
 

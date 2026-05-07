@@ -739,6 +739,9 @@ namespace ClassicUO.Configuration
                                     NameOverHeadHandlerGump.LastPosition = new Point(x, y);
                                     // Gump gets opened by NameOverHeadManager, we just want to save the last position from profile
                                     break;
+                                case GumpType.DurabilityGump:
+                                    gump = new DurabilitysGump(world);
+                                    break;
                             }
 
                             if (gump == null)

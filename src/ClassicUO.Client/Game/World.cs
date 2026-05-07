@@ -52,6 +52,7 @@ namespace ClassicUO.Game
             SplashEffect = new SplashEffect();
             PuddleEffect = new PuddleEffect();
             InfoBars = new InfoBarManager(this);
+            DurabilityManager = new DurabilityManager(this);
         }
 
         public Point RangeSize;
@@ -109,6 +110,8 @@ namespace ClassicUO.Game
         public PuddleEffect PuddleEffect { get; }
 
         public InfoBarManager InfoBars { get; }
+
+        public DurabilityManager DurabilityManager { get; }
 
         public Dictionary<uint, Item> Items { get; } = new Dictionary<uint, Item>();
 

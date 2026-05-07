@@ -28,6 +28,7 @@ namespace ClassicUO.Game.UI.Gumps
         Debug,
         NetStats,
 
-        NameOverHeadHandler
+        NameOverHeadHandler,
+        DurabilityGump = 6465,
     }
 }
