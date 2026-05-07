@@ -251,49 +251,40 @@ namespace ClassicUO.Game.GameObjects
                     batcher.DrawShadow(artInfo.Texture, pos, artInfo.UV, false, depth + 0.25f);
                 }
 
-                var scale = Vector2.One;
-                if (isWet)
-                {
-                    batcher.Draw(
-                        artInfo.Texture,
-                        pos,
-                        artInfo.UV,
-                        hue,
-                        0f,
-                        Vector2.Zero,
-                        scale,
-                        SpriteEffects.None,
-                        depth + 0.5f
-                    );
+var scale = Vector2.One;
 
-                    float globalTime = Time.Ticks / 1000f;
+if (isWet)
+{
+    float globalTime = Time.Ticks / 1000f;
 
-                    if (animationSeed != 0)
-                    {
-                        // Shared wind gust cycle for foliage with delayed start/stop per tile.
-                        float offset = (animationSeed & 0xFF) / 255f * 0.8f;
-                        float localWindTime = globalTime - offset;
+    if (animationSeed != 0)
+    {
+        // Shared wind gust cycle for foliage with delayed start/stop per tile.
+        float offset = (animationSeed & 0xFF) / 255f * 0.8f;
+        float localWindTime = globalTime - offset;
 
-                        const float gustPeriod = 14f;
-                        float gustWave = 0.5f + 0.5f * (float)Math.Sin((localWindTime / gustPeriod) * MathHelper.TwoPi);
+        const float gustPeriod = 14f;
+        float gustWave = 0.5f + 0.5f * (float)Math.Sin((localWindTime / gustPeriod) * MathHelper.TwoPi);
 
-                        float weatherSway = Weather.FoliageSwayIntensity;
-                        float gustStrength = Math.Clamp(0.35f + gustWave * 0.65f, 0f, 1f) * weatherSway;
+        float weatherSway = Weather.FoliageSwayIntensity;
+        float gustStrength = Math.Clamp(0.35f + gustWave * 0.65f, 0f, 1f) * weatherSway;
 
-                        float baseSway = (float)Math.Sin(globalTime * (1.25f + weatherSway * 0.55f));
-                        float crossSway = (float)Math.Cos(globalTime * (0.95f + weatherSway * 0.4f));
-                        float swayX = baseSway * 0.08f * gustStrength;
-                        float swayY = crossSway * 0.035f * gustStrength;
-                        scale = new Vector2(1.1f + swayX, 1.1f + swayY);
-                    }
-                    else
-                    {
-                        // Preserve existing water animation behavior.
-                        var sin = (float)Math.Sin(globalTime);
-                        var cos = (float)Math.Cos(globalTime);
-                        scale = new Vector2(1.1f + sin * 0.1f, 1.1f + cos * 0.5f * 0.1f);
-                    }
-                }
+        float baseSway = (float)Math.Sin(globalTime * (1.25f + weatherSway * 0.55f));
+        float crossSway = (float)Math.Cos(globalTime * (0.95f + weatherSway * 0.4f));
+        float swayX = baseSway * 0.08f * gustStrength;
+        float swayY = crossSway * 0.035f * gustStrength;
+
+        scale = new Vector2(1.1f + swayX, 1.1f + swayY);
+    }
+    else
+    {
+        // Preserve existing water animation behavior.
+        var sin = (float)Math.Sin(globalTime);
+        var cos = (float)Math.Cos(globalTime);
+
+        scale = new Vector2(1.1f + sin * 0.1f, 1.1f + cos * 0.5f * 0.1f);
+    }
+}
 
                 batcher.Draw(
                     artInfo.Texture,
