@@ -1,4 +1,5 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+﻿
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System.Collections.Generic;
 using ClassicUO.Configuration;
@@ -48,6 +49,7 @@ namespace ClassicUO.Game.Managers
         private uint _lastUpdate, _lastPacketSend, _lastPacketRecv;
         private readonly List<WMapEntity> _toRemove = new List<WMapEntity>();
         private readonly World _world;
+        public WMapEntity _corpse;
 
         public WorldMapEntityManager(World world) { _world = world; }
 
@@ -162,6 +164,11 @@ namespace ClassicUO.Game.Managers
 
         public void RemoveUnupdatedWEntity()
         {
+            if (_corpse != null && _corpse.LastUpdate < Time.Ticks - 1000)
+            {
+                _corpse = null;
+            }
+
             if (_lastUpdate > Time.Ticks)
             {
                 return;

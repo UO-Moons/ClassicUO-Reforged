@@ -79,6 +79,24 @@ namespace ClassicUO.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accessibility Mode.
+        /// </summary>
+        public static string AccessibilityMode {
+            get {
+                return ResourceManager.GetString("AccessibilityMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Accessibility Preset.
+        /// </summary>
+        public static string AccessibilityPreset {
+            get {
+                return ResourceManager.GetString("AccessibilityPreset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account Name.
         /// </summary>
         public static string Account {
@@ -282,6 +300,15 @@ namespace ClassicUO.Resources {
         public static string AnimatedWaterEffect {
             get {
                 return ResourceManager.GetString("AnimatedWaterEffect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Animation Intensity.
+        /// </summary>
+        public static string AnimationIntensity {
+            get {
+                return ResourceManager.GetString("AnimationIntensity", resourceCulture);
             }
         }
         
@@ -1158,18 +1185,7 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("Decline", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Screen zoom:.
-        /// </summary>
-        public static string ScreenZoom
-        {
-            get
-            {
-                return ResourceManager.GetString("ScreenZoom", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Default zoom:.
         /// </summary>
@@ -3336,6 +3352,15 @@ namespace ClassicUO.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reduce Flash Effects.
+        /// </summary>
+        public static string ReduceFlashEffects {
+            get {
+                return ResourceManager.GetString("ReduceFlashEffects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Relative drag and drop items in containers.
         /// </summary>
         public static string RelativeDragAndDropContainers {
@@ -3692,6 +3717,15 @@ namespace ClassicUO.Resources {
         public static string ShowCaps {
             get {
                 return ResourceManager.GetString("ShowCaps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show corpse.
+        /// </summary>
+        public static string ShowCorpse {
+            get {
+                return ResourceManager.GetString("ShowCorpse", resourceCulture);
             }
         }
         
@@ -4579,45 +4613,6 @@ namespace ClassicUO.Resources {
         public static string WeatherEffects {
             get {
                 return ResourceManager.GetString("WeatherEffects", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Accessibility Mode.
-        /// </summary>
-        public static string AccessibilityMode {
-            get {
-                return ResourceManager.GetString("AccessibilityMode", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Reduce Flash Effects.
-        /// </summary>
-        public static string ReduceFlashEffects {
-            get {
-                return ResourceManager.GetString("ReduceFlashEffects", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Animation Intensity.
-        /// </summary>
-        public static string AnimationIntensity {
-            get {
-                return ResourceManager.GetString("AnimationIntensity", resourceCulture);
-            }
-        }
-
-
-
-
-        /// <summary>
-        ///   Looks up a localized string similar to Accessibility Preset.
-        /// </summary>
-        public static string AccessibilityPreset {
-            get {
-                return ResourceManager.GetString("AccessibilityPreset", resourceCulture);
             }
         }
         

@@ -1234,6 +1234,9 @@ Min. Skill: {1}</value>
   <data name="ShowPartyMembers" xml:space="preserve">
     <value>Show party members</value>
   </data>
+  <data name="ShowCorpse" xml:space="preserve">
+    <value>Show corpse</value>
+  </data>
   <data name="ShowMobiles" xml:space="preserve">
     <value>Show mobiles</value>
   </data>

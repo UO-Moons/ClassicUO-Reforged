@@ -79,6 +79,7 @@ namespace ClassicUO.Game.UI.Gumps
         private bool _showMarkerIcons = true;
         private bool _showMarkerNames = true;
         private bool _showMarkers = true;
+        private bool _showCorpse = true;
         private bool _showMobiles = true;
         private bool _showMultis = true;
         private bool _showPartyMembers = true;
@@ -192,7 +193,7 @@ namespace ClassicUO.Game.UI.Gumps
             _showSextantCoordinates = ProfileManager.CurrentProfile.WorldMapShowSextantCoordinates;
             _showMouseCoordinates = ProfileManager.CurrentProfile.WorldMapShowMouseCoordinates;
             _showMobiles = ProfileManager.CurrentProfile.WorldMapShowMobiles;
-
+            _showCorpse = ProfileManager.CurrentProfile.WorldMapShowCorpse;
             _showPlayerName = ProfileManager.CurrentProfile.WorldMapShowPlayerName;
             _showPlayerBar = ProfileManager.CurrentProfile.WorldMapShowPlayerBar;
             _showGroupName = ProfileManager.CurrentProfile.WorldMapShowGroupName;
@@ -233,7 +234,7 @@ namespace ClassicUO.Game.UI.Gumps
             ProfileManager.CurrentProfile.WorldMapShowSextantCoordinates = _showSextantCoordinates;
             ProfileManager.CurrentProfile.WorldMapShowMouseCoordinates = _showMouseCoordinates;
             ProfileManager.CurrentProfile.WorldMapShowMobiles = _showMobiles;
-
+            ProfileManager.CurrentProfile.WorldMapShowCorpse = _showCorpse;
             ProfileManager.CurrentProfile.WorldMapShowPlayerName = _showPlayerName;
             ProfileManager.CurrentProfile.WorldMapShowPlayerBar = _showPlayerBar;
             ProfileManager.CurrentProfile.WorldMapShowGroupName = _showGroupName;
@@ -305,6 +306,8 @@ namespace ClassicUO.Game.UI.Gumps
                 true,
                 _showPartyMembers
             );
+
+            _options["show_corpse"] = new ContextMenuItemEntry(ResGumps.ShowCorpse, () => { _showCorpse = !_showCorpse; SaveSettings(); }, true, _showCorpse);
 
             _options["show_mobiles"] = new ContextMenuItemEntry(ResGumps.ShowMobiles, () => { _showMobiles = !_showMobiles; SaveSettings(); }, true, _showMobiles);
 
@@ -510,6 +513,7 @@ namespace ClassicUO.Game.UI.Gumps
             ContextMenu.Add("", null);
             ContextMenu.Add(_options["show_party_members"]);
             ContextMenu.Add(_options["show_mobiles"]);
+            ContextMenu.Add(_options["show_corpse"]);
             ContextMenu.Add(_options["show_multis"]);
             ContextMenu.Add(_options["show_coordinates"]);
             ContextMenu.Add(_options["show_sextant_coordinates"]);
@@ -2249,6 +2253,56 @@ namespace ClassicUO.Game.UI.Gumps
                         }
                     }
                 }
+            }
+
+            if (_showCorpse && World.WMapManager._corpse != null)
+            {
+                const int DOT_SIZE = 4;
+                const int DOT_SIZE_HALF = DOT_SIZE >> 1;
+                DrawWMEntity
+                    (
+                        batcher,
+                        World.WMapManager._corpse,
+                        gX,
+                        gY,
+                        halfWidth,
+                        halfHeight,
+                        Zoom,
+                        layerDepth
+                    );
+                if (World.WMapManager._corpse.Map == World.Map.Index)
+                {
+                    int sx = World.WMapManager._corpse.X - _center.X;
+                    int sy = World.WMapManager._corpse.Y - _center.Y;
+
+                    Point pdrot = RotatePoint(sx, sy, Zoom, 1, _flipMap ? 45f : 0f);
+
+                    pdrot.X += gX + halfWidth;
+                    pdrot.Y += gY + halfHeight;
+
+                    int psx = World.Player.X - _center.X;
+                    int psy = World.Player.Y - _center.Y;
+
+                    Point prot = RotatePoint(psx, psy, Zoom, 1, _flipMap ? 45f : 0f);
+
+                    prot.X += gX + halfWidth;
+                    prot.Y += gY + halfHeight;
+
+                    Vector2 start = new Vector2(pdrot.X - DOT_SIZE_HALF, pdrot.Y - DOT_SIZE_HALF);
+                    Vector2 end = new Vector2(prot.X, prot.Y);
+
+                    //DRAW LINE FROM PLAYER TO DEATH LOCATION
+                    batcher.DrawLine
+                    (
+                        SolidColorTextureCache.GetTexture(Color.YellowGreen),
+                        start,
+                        end,
+                        ShaderHueTranslator.GetHueVector(0),
+                        1f,
+                        0f
+                    );
+                }
+
             }
 
             DrawMobile

@@ -392,6 +392,7 @@ namespace ClassicUO.Configuration
         public bool WorldMapShowMarkers { get; set; } = true;
         public bool WorldMapShowMarkersNames { get; set; } = true;
         public bool WorldMapShowMultis { get; set; } = true;
+        public bool WorldMapShowCorpse { get; set; } = true;
         public string WorldMapHiddenMarkerFiles { get; set; } = string.Empty;
         public string WorldMapHiddenZoneFiles { get; set; } = string.Empty;
         public bool WorldMapShowGridIfZoomed { get; set; } = true;

@@ -10,6 +10,10 @@ using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.IO;
+using ClassicUO.Game.Map;
+using System.Linq;
+using System.Xml.Linq;
+using static ClassicUO.Game.UI.Gumps.WorldMapGump;
 using ClassicUO.Renderer;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
@@ -1402,13 +1406,12 @@ namespace ClassicUO.Network
 
                 if (item != null)
                 {
-                    if (
-                        item.IsCorpse
-                        && (
-                            ProfileManager.CurrentProfile.GridLootType == 1
-                            || ProfileManager.CurrentProfile.GridLootType == 2
-                        )
-                    )
+                    if (item.IsCorpse && world.WMapManager._corpse != null && item.Serial == world.WMapManager._corpse.Serial)
+                    {
+                        world.WMapManager._corpse = null;
+                    }
+
+                    if ( item.IsCorpse && ( ProfileManager.CurrentProfile.GridLootType == 1 || ProfileManager.CurrentProfile.GridLootType == 2))
                     {
                         //UIManager.GetGump<GridLootGump>(serial)?.Dispose();
                         //UIManager.Add(new GridLootGump(serial));
@@ -1422,8 +1425,7 @@ namespace ClassicUO.Network
 
                     ContainerGump container = UIManager.GetGump<ContainerGump>(serial);
                     bool playsound = false;
-                    int x,
-                        y;
+                    int x, y;
 
                     // TODO: check client version ?
                     if (
@@ -1759,6 +1761,16 @@ namespace ClassicUO.Network
                 }
 
                 GameActions.RequestWarMode(world.Player, false);
+                world.WMapManager._corpse = new WMapEntity(world.Player.Serial)
+                {
+                    X = world.Player.X,
+                    Y = world.Player.Y,
+                    HP = 0,
+                    Map = world.Map.Index,
+                    LastUpdate = Time.Ticks + (1000 * 60 * 5),
+                    IsGuild = false,
+                    Name = "Your Corpse"
+                };
             }
         }
 
