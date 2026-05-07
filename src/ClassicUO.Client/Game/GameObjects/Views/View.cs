@@ -266,6 +266,38 @@ namespace ClassicUO.Game.GameObjects
                         depth + 0.5f
                     );
 
+                    float globalTime = Time.Ticks / 1000f;
+
+                    // Shared wind gust cycle: all foliage follows the same directional sway,
+                    // with per-instance delayed start/stop for a natural wave through trees.
+                    float offset = animationSeed != 0 ? (animationSeed & 0xFF) / 255f * 0.8f : 0f;
+                    float localWindTime = globalTime - offset;
+
+                    const float gustPeriod = 8f;
+                    const float gustActive = 4.5f;
+                    float gustPhase = localWindTime % gustPeriod;
+
+                    if (gustPhase < 0f)
+                    {
+                        gustPhase += gustPeriod;
+                    }
+
+                    float gustStrength = 0f;
+
+                    if (gustPhase < gustActive)
+                    {
+                        float x = gustPhase / gustActive;
+                        // Smooth in/out envelope so wind ramps up and lets up gradually.
+                        gustStrength = x < 0.5f
+                            ? 2f * x * x
+                            : 1f - (float)Math.Pow(-2f * x + 2f, 2f) * 0.5f;
+                    }
+
+                    float baseSway = (float)Math.Sin(globalTime * 2.2f);
+                    float crossSway = (float)Math.Cos(globalTime * 1.7f);
+                    float swayX = baseSway * 0.1f * gustStrength;
+                    float swayY = crossSway * 0.05f * gustStrength;
+                    scale = new Vector2(1.1f + swayX, 1.1f + swayY);
                     float timeFactor = Time.Ticks / 1000f;
 
                     if (animationSeed != 0)
