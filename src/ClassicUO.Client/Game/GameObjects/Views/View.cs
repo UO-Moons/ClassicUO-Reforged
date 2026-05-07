@@ -225,7 +225,8 @@ namespace ClassicUO.Game.GameObjects
             Vector3 hue,
             bool shadow,
             float depth,
-            bool isWet = false
+            bool isWet = false,
+            uint animationSeed = 0
         )
         {
             ref UOFileIndex index = ref Client.Game.UO.FileManager.Arts.File.GetValidRefEntry(graphic + 0x4000);
@@ -265,8 +266,17 @@ namespace ClassicUO.Game.GameObjects
                         depth + 0.5f
                     );
 
-                    var sin = (float)Math.Sin(Time.Ticks / 1000f);
-                    var cos = (float)Math.Cos(Time.Ticks / 1000f);
+                    float timeFactor = Time.Ticks / 1000f;
+
+                    if (animationSeed != 0)
+                    {
+                        float speed = 0.75f + ((animationSeed & 0xFF) / 255f) * 0.7f;
+                        float phase = ((animationSeed >> 8) & 0xFF) / 255f * MathHelper.TwoPi;
+                        timeFactor = (Time.Ticks / 1000f) * speed + phase;
+                    }
+
+                    var sin = (float)Math.Sin(timeFactor);
+                    var cos = (float)Math.Cos(timeFactor);
                     scale = new Vector2(1.1f + sin * 0.1f, 1.1f + cos * 0.5f * 0.1f);
                 }
 

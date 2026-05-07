@@ -79,6 +79,8 @@ namespace ClassicUO.Game.GameObjects
                 graphic = Constants.TREE_REPLACE_GRAPHIC;
             }
 
+            bool isSwayingLeaf = _swayingLeafGraphics.Contains(graphic);
+
             DrawStaticAnimated(
                 batcher,
                 graphic,
@@ -89,8 +91,8 @@ namespace ClassicUO.Game.GameObjects
                     && ProfileManager.CurrentProfile.ShadowsStatics
                     && (isTree || ItemData.IsFoliage || StaticFilters.IsRock(graphic)),
                 depth,
-                ProfileManager.CurrentProfile.AnimatedWaterEffect
-                    && (ItemData.IsWet || _swayingLeafGraphics.Contains(graphic))
+                ProfileManager.CurrentProfile.AnimatedWaterEffect && (ItemData.IsWet || isSwayingLeaf),
+                isSwayingLeaf ? (uint)((X * 73856093) ^ (Y * 19349663) ^ graphic) : 0 && (ItemData.IsWet || _swayingLeafGraphics.Contains(graphic))
             );
 
             if (ItemData.IsLight)
