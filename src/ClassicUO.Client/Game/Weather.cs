@@ -233,6 +233,7 @@ namespace ClassicUO.Game
         public byte Temperature { get; private set; }
         public sbyte Wind { get; private set; }
 
+        public static float FoliageSwayIntensity { get; private set; } = 0.25f;
 
 
         private static float SinOscillate(float freq, int range, uint current_tick)
@@ -243,6 +244,24 @@ namespace ClassicUO.Game
         }
 
 
+        private void UpdateFoliageSwayIntensity()
+        {
+            float weatherBoost = Type switch
+            {
+                WeatherType.WT_STORM_APPROACH => 0.75f,
+                WeatherType.WT_RAIN => 0.45f,
+                WeatherType.WT_STORM_BREWING => 0.6f,
+                _ => 0.15f
+            };
+
+            float windFactor = Math.Abs(Wind) / 4f;
+            float precipFactor = ScaledCount / (float)MAX_WEATHER_EFFECT;
+            float target = 0.2f + windFactor * 0.35f + weatherBoost * precipFactor;
+            target = Math.Clamp(target, 0.2f, 1.2f);
+
+            FoliageSwayIntensity = MathHelper.Lerp(FoliageSwayIntensity, target, 0.05f);
+        }
+
         public void Reset()
         {
             Type = 0;
@@ -252,6 +271,7 @@ namespace ClassicUO.Game
             CurrentWeather = null;
             StopRainSound();
             _world.PuddleEffect.Reset();
+            FoliageSwayIntensity = 0.25f;
         }
 
         public void Generate(WeatherType type, byte count, byte temp)
@@ -868,6 +888,8 @@ namespace ClassicUO.Game
                     windChanged = true;
                 }
             }
+
+            UpdateFoliageSwayIntensity();
 
             //switch ((WEATHER_TYPE) Type)
             //{

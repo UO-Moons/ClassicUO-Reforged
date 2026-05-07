@@ -263,30 +263,16 @@ if (isWet)
         float offset = (animationSeed & 0xFF) / 255f * 0.8f;
         float localWindTime = globalTime - offset;
 
-        const float gustPeriod = 8f;
-        const float gustActive = 4.5f;
-        float gustPhase = localWindTime % gustPeriod;
+        const float gustPeriod = 14f;
+        float gustWave = 0.5f + 0.5f * (float)Math.Sin((localWindTime / gustPeriod) * MathHelper.TwoPi);
 
-        if (gustPhase < 0f)
-        {
-            gustPhase += gustPeriod;
-        }
+        float weatherSway = Weather.FoliageSwayIntensity;
+        float gustStrength = Math.Clamp(0.35f + gustWave * 0.65f, 0f, 1f) * weatherSway;
 
-        float gustStrength = 0f;
-
-        if (gustPhase < gustActive)
-        {
-            float gustT = gustPhase / gustActive;
-
-            gustStrength = gustT < 0.5f
-                ? 2f * gustT * gustT
-                : 1f - (float)Math.Pow(-2f * gustT + 2f, 2f) * 0.5f;
-        }
-
-        float baseSway = (float)Math.Sin(globalTime * 2.2f);
-        float crossSway = (float)Math.Cos(globalTime * 1.7f);
-        float swayX = baseSway * 0.1f * gustStrength;
-        float swayY = crossSway * 0.05f * gustStrength;
+        float baseSway = (float)Math.Sin(globalTime * (1.25f + weatherSway * 0.55f));
+        float crossSway = (float)Math.Cos(globalTime * (0.95f + weatherSway * 0.4f));
+        float swayX = baseSway * 0.08f * gustStrength;
+        float swayY = crossSway * 0.035f * gustStrength;
 
         scale = new Vector2(1.1f + swayX, 1.1f + swayY);
     }
