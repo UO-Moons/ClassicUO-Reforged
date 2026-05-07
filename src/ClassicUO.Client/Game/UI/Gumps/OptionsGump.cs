@@ -2010,19 +2010,7 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             startY += 25;
-           //section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
-
-            //startY += 25;
-            //section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
-
-            //section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
-
-            
-           section4.Add(_accessibilityEnabled = AddCheckBox(null, "Accessibility Mode", _currentProfile.AccessibilityEnabled, startX, startY));
-           section4.AddRight(_reduceFlashEffects = AddCheckBox(null, "Reduce Flash Effects", _currentProfile.ReduceFlashEffects, startX, startY));
-
-            startY += 25;
-            section4.Add(AddLabel(null, "Animation Intensity", startX, startY));
+            section4.Add(AddLabel(null, ResGumps.AnimationIntensity, startX, startY));
             section4.AddRight(_accessibilityAnimationIntensity = AddHSlider(null, 0, 100, _currentProfile.AnimationIntensityPercent, startX, startY, 200));
 
             SettingsSection section5 = AddSettingsSection(box, "Shadows");
@@ -4251,14 +4239,6 @@ namespace ClassicUO.Game.UI.Gumps
                 _currentProfile.ReduceFlashEffects = false;
                 _currentProfile.AnimationIntensityPercent = 100;
             }
-
-
-
-            _currentProfile.ReduceFlashEffects = _reduceFlashEffects.IsChecked;
-            _currentProfile.AnimationIntensityPercent = _accessibilityAnimationIntensity.Value;
-
-
-
             _currentProfile.PartyAura = _partyAura.IsChecked;
             _currentProfile.PartyAuraHue = _partyAuraColorPickerBox.Hue;
             _currentProfile.HideChatGradient = _hideChatGradient.IsChecked;
