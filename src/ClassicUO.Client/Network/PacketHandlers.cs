@@ -5650,6 +5650,54 @@ namespace ClassicUO.Network
             }
         }
 
+        private const uint KNOWN_ASSISTANT_FEATURE_MASK =
+            (uint)(AssistantFeatureFlags.FilterWeather
+            | AssistantFeatureFlags.FilterLight
+            | AssistantFeatureFlags.AutoOpenDoors
+            | AssistantFeatureFlags.OverheadHealth
+            | AssistantFeatureFlags.FilterSeason);
+
+        private static AssistantFeatureFlags ParseAssistantFeatureFlags(ref StackDataReader p)
+        {
+            int remaining = Math.Min(p.Remaining, 8);
+            Span<byte> raw = stackalloc byte[8];
+
+            for (int i = 0; i < remaining; i++)
+            {
+                raw[i] = p.ReadUInt8();
+            }
+
+            uint[] candidates = new uint[4];
+            if (remaining >= 4)
+            {
+                candidates[0] = ((uint)raw[0] << 24) | ((uint)raw[1] << 16) | ((uint)raw[2] << 8) | raw[3];
+                candidates[1] = ((uint)raw[3] << 24) | ((uint)raw[2] << 16) | ((uint)raw[1] << 8) | raw[0];
+            }
+
+            if (remaining >= 8)
+            {
+                candidates[2] = ((uint)raw[4] << 24) | ((uint)raw[5] << 16) | ((uint)raw[6] << 8) | raw[7];
+                candidates[3] = ((uint)raw[7] << 24) | ((uint)raw[6] << 16) | ((uint)raw[5] << 8) | raw[4];
+            }
+
+            uint best = 0;
+            int bestBits = -1;
+
+            foreach (uint candidate in candidates)
+            {
+                uint known = candidate & KNOWN_ASSISTANT_FEATURE_MASK;
+                int bits = System.Numerics.BitOperations.PopCount(known);
+
+                if (bits > bestBits)
+                {
+                    bestBits = bits;
+                    best = known;
+                }
+            }
+
+            return (AssistantFeatureFlags)best;
+        }
+
         private static void DisplayWaypoint(World world, ref StackDataReader p)
         {
             uint serial = p.ReadUInt32BE();
@@ -5723,7 +5771,7 @@ namespace ClassicUO.Network
                 case 0xFE:
                     if (p.Remaining >= 4)
                     {
-                        AssistantFeatureFlags disabledFlags = (AssistantFeatureFlags)p.ReadUInt32BE();
+                        AssistantFeatureFlags disabledFlags = ParseAssistantFeatureFlags(ref p);
                         ApplyAssistantFeatureRestrictions(disabledFlags);
                         Log.Info($"Assistant restrictions applied: 0x{(uint)disabledFlags:X8}");
                     }
