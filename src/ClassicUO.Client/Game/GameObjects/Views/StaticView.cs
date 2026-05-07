@@ -6,12 +6,22 @@ using ClassicUO.Game.Scenes;
 using ClassicUO.IO;
 using ClassicUO.Assets;
 using ClassicUO.Renderer;
+using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.GameObjects
 {
     internal sealed partial class Static
     {
+        private static readonly HashSet<ushort> _swayingLeafGraphics =
+        [
+            0x0D95, 0x0D96, 0x0D97, 0x0D99, 0x0D9A, 0x0D9B, 0x0D9D, 0x0D9E, 0x0D9F,
+            0x0DA1, 0x0DA2, 0x0DA3, 0x0DA5, 0x0DA6, 0x0DA7, 0x0DA9, 0x0DAA, 0x0DAB,
+            0x0CCE, 0x0CCF, 0x0CD1, 0x0CD2, 0x0CD4, 0x0CD5, 0x0CD7, 0x0CD9, 0x0CDB,
+            0x0CDC, 0x0CDE, 0x0CDF, 0x0CE1, 0x0CE2, 0x0CE4, 0x0CE5, 0x0CE7, 0x0CE8
+        ];
+
         private int _canBeTransparent;
 
         public override bool TransparentTest(int z)
@@ -69,6 +79,8 @@ namespace ClassicUO.Game.GameObjects
                 graphic = Constants.TREE_REPLACE_GRAPHIC;
             }
 
+            bool isSwayingLeaf = _swayingLeafGraphics.Contains(graphic);
+
             DrawStaticAnimated(
                 batcher,
                 graphic,
@@ -79,7 +91,9 @@ namespace ClassicUO.Game.GameObjects
                     && ProfileManager.CurrentProfile.ShadowsStatics
                     && (isTree || ItemData.IsFoliage || StaticFilters.IsRock(graphic)),
                 depth,
-                ProfileManager.CurrentProfile.AnimatedWaterEffect && ItemData.IsWet
+                ProfileManager.CurrentProfile.AnimatedWaterEffect
+                    && (ItemData.IsWet || isSwayingLeaf),
+                isSwayingLeaf ? (uint)((X * 73856093) ^ (Y * 19349663) ^ graphic) : 0
             );
 
             if (ItemData.IsLight)
