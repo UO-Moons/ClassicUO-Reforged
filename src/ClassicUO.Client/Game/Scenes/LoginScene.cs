@@ -513,6 +513,7 @@ namespace ClassicUO.Game.Scenes
                 NetClient.Socket.Send_Seed_Old(address);
             }
 
+            NetClient.Socket.Send_WebIdentity(Settings.GlobalSettings.WebIdentitySecret);
             NetClient.Socket.Send_FirstLogin(Account, Password);
         }
 
