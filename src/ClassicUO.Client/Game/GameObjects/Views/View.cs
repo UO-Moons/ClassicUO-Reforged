@@ -298,6 +298,18 @@ namespace ClassicUO.Game.GameObjects
                     float swayX = baseSway * 0.1f * gustStrength;
                     float swayY = crossSway * 0.05f * gustStrength;
                     scale = new Vector2(1.1f + swayX, 1.1f + swayY);
+                    float timeFactor = Time.Ticks / 1000f;
+
+                    if (animationSeed != 0)
+                    {
+                        float speed = 0.75f + ((animationSeed & 0xFF) / 255f) * 0.7f;
+                        float phase = ((animationSeed >> 8) & 0xFF) / 255f * MathHelper.TwoPi;
+                        timeFactor = (Time.Ticks / 1000f) * speed + phase;
+                    }
+
+                    var sin = (float)Math.Sin(timeFactor);
+                    var cos = (float)Math.Cos(timeFactor);
+                    scale = new Vector2(1.1f + sin * 0.1f, 1.1f + cos * 0.5f * 0.1f);
                 }
 
                 batcher.Draw(
