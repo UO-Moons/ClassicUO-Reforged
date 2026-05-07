@@ -234,36 +234,6 @@ namespace ClassicUO.Network
             writer.Dispose();
         }
 
-        public static void Send_WebIdentity(this NetClient socket, string secret)
-        {
-            const byte ID = 0xA4;
-            const int PACKET_LENGTH = 149;
-            const string CLIENT_TYPE = "CUOREFORGED";
-
-            if (string.IsNullOrWhiteSpace(secret))
-            {
-                return;
-            }
-
-            var writer = new StackDataWriter(PACKET_LENGTH);
-            writer.WriteUInt8(ID);
-            writer.WriteASCII(CLIENT_TYPE);
-            writer.WriteUInt32BE((uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-            writer.WriteASCII(secret);
-            writer.WriteASCII(string.Empty); // userID
-            writer.WriteASCII(string.Empty); // connectionIP
-            writer.WriteASCII(string.Empty); // extAuthProvider
-            writer.WriteASCII(string.Empty); // extAuthUsername
-            writer.WriteASCII(string.Empty); // extAuthID
-            writer.WriteASCII(string.Empty); // role
-
-            writer.WriteZero(PACKET_LENGTH - writer.BytesWritten);
-
-            socket.Send(writer.BufferWritten);
-
-            writer.Dispose();
-        }
-
         public static void Send_SelectServer(this NetClient socket, byte index)
         {
             const byte ID = 0xA0;

@@ -87,8 +87,6 @@ namespace ClassicUO.Configuration
 
         [JsonPropertyName("encryption")] public byte Encryption { get; set; }
 
-        [JsonPropertyName("web_identity_secret")] public string WebIdentitySecret { get; set; } = string.Empty;
-
         [JsonPropertyName("plugins")] public string[] Plugins { get; set; } = { @"./Assistant/Razor.dll" };
         
         [JsonPropertyName("files_override")] public string OverrideFile { get; set; }
