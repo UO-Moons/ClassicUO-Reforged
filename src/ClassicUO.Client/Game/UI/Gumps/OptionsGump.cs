@@ -3763,7 +3763,7 @@ namespace ClassicUO.Game.UI.Gumps
                     _gameWindowPositionY.SetText("20");
                     _gameWindowLock.IsChecked = false;
                     _gameWindowFullsize.IsChecked = false;
-                    _enableDeathScreen.IsChecked = true;
+                    _enableDeathScreen.IsChecked = false;
                     _enableBlackWhiteEffect.IsChecked = true;
                     Client.Game.Scene.Camera.Zoom = 1f;
                     _currentProfile.DefaultScale = 1f;
