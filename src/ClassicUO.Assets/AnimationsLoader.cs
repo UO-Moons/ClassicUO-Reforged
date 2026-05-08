@@ -20,13 +20,14 @@ namespace ClassicUO.Assets
     {
         public const int MAX_ACTIONS = 80; // gargoyle is like 78
         public const int MAX_DIRECTIONS = 5;
+        public const int MAX_ANIMATION_FILES = 20;
 
 
         [ThreadStatic]
         private static FrameInfo[] _frames;
 
-        private readonly UOFileMul[] _files = new UOFileMul[10];
-        private readonly UOFileUop[] _filesUop = new UOFileUop[10];
+        private readonly UOFileMul[] _files = new UOFileMul[MAX_ANIMATION_FILES];
+        private readonly UOFileUop[] _filesUop = new UOFileUop[MAX_ANIMATION_FILES];
 
         private readonly Dictionary<ushort, Dictionary<ushort, EquipConvData>> _equipConv = new Dictionary<ushort, Dictionary<ushort, EquipConvData>>();
         private readonly Dictionary<int, MobTypeInfo> _mobTypes = new Dictionary<int, MobTypeInfo>();
@@ -336,6 +337,11 @@ namespace ClassicUO.Assets
             if (animType == AnimationGroupsType.Unknown)
                 animType = mobInfo.Type != AnimationGroupsType.Unknown ? mobInfo.Type : CalculateTypeByGraphic(body, fileIndex);
 
+            if (fileIndex < 0 || fileIndex >= _files.Length || _files[fileIndex] == null)
+            {
+                return ReadOnlySpan<AnimationDirection>.Empty;
+            }
+
             var fileIdx = _files[fileIndex].IdxFile;
             var offsetAddress = CalculateOffset(body, animType, flags, out var actionCount);
 
@@ -539,16 +545,13 @@ namespace ClassicUO.Assets
                         }
 
                         // Ensure the client is allowed to use these new graphics
-                        if (i == 1)
+                        if (i <= 20)
                         {
-                            if (!flags.HasFlag(BodyConvFlags.Anim1))
-                            {
-                                continue;
-                            }
-                        }
-                        else if (i == 2)
-                        {
-                            if (!flags.HasFlag(BodyConvFlags.Anim2))
+                            var requiredFlag = (BodyConvFlags)(1 << (i - 1));
+
+                            // Keep original behavior: anim1/anim2 require expansion flags.
+                            // Higher custom anim files are accepted automatically.
+                            if ((flags & requiredFlag) == 0 && i <= 2)
                             {
                                 continue;
                             }
@@ -1772,10 +1775,26 @@ namespace ClassicUO.Assets
     [Flags]
     public enum BodyConvFlags
     {
-        Anim1 = 0x1,
-        Anim2 = 0x2,
-        Anim3 = 0x4,
-        Anim4 = 0x8,
-        Anim5 = 0x10,
+        None = 0x0,
+        Anim1 = 1 << 0,
+        Anim2 = 1 << 1,
+        Anim3 = 1 << 2,
+        Anim4 = 1 << 3,
+        Anim5 = 1 << 4,
+        Anim6 = 1 << 5,
+        Anim7 = 1 << 6,
+        Anim8 = 1 << 7,
+        Anim9 = 1 << 8,
+        Anim10 = 1 << 9,
+        Anim11 = 1 << 10,
+        Anim12 = 1 << 11,
+        Anim13 = 1 << 12,
+        Anim14 = 1 << 13,
+        Anim15 = 1 << 14,
+        Anim16 = 1 << 15,
+        Anim17 = 1 << 16,
+        Anim18 = 1 << 17,
+        Anim19 = 1 << 18,
+        Anim20 = 1 << 19
     }
 }
