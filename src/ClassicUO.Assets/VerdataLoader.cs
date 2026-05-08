@@ -3,8 +3,6 @@
 using ClassicUO.IO;
 using ClassicUO.Utility.Logging;
 using System;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace ClassicUO.Assets
 {

@@ -11,8 +11,6 @@ using ClassicUO.Utility.Logging;
 namespace ClassicUO.Assets;
 
 
-// ( •_•)>⌐■-■
-// https://github.com/cbnolok/UOETE/blob/master/src/uotileart.cpp
 public sealed class TileArtLoader : UOFileLoader
 {
     private readonly Dictionary<uint, TileArtInfo> _tileArtInfos = [];

@@ -1,9 +1,6 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
-using ClassicUO.Assets;
-using ClassicUO.IO;
 using System;
-using System.Threading.Tasks;
 
 namespace ClassicUO.Assets
 {
