@@ -3962,7 +3962,19 @@ namespace ClassicUO.Resources {
                 return ResourceManager.GetString("SmoothBoat", resourceCulture);
             }
         }
-        
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Screen zoom:.
+        /// </summary>
+        public static string ScreenZoom
+        {
+            get
+            {
+                return ResourceManager.GetString("ScreenZoom", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Smooth doors.
         /// </summary>
