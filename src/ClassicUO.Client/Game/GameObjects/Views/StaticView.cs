@@ -92,7 +92,8 @@ DrawStaticAnimated(
         && (isTree || ItemData.IsFoliage || StaticFilters.IsRock(graphic)),
     depth,
     ProfileManager.CurrentProfile.AnimatedWaterEffect
-        && (ItemData.IsWet || isSwayingLeaf),
+        && ItemData.IsWet,
+    isSwayingLeaf,
     isSwayingLeaf
         ? (uint)((X * 73856093) ^ (Y * 19349663) ^ graphic)
         : 0u

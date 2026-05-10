@@ -225,7 +225,8 @@ namespace ClassicUO.Game.GameObjects
             Vector3 hue,
             bool shadow,
             float depth,
-            bool isWet = false,
+            bool animateWater = false,
+            bool animateFoliage = false,
             uint animationSeed = 0
         )
         {
@@ -251,40 +252,47 @@ namespace ClassicUO.Game.GameObjects
                     batcher.DrawShadow(artInfo.Texture, pos, artInfo.UV, false, depth + 0.25f);
                 }
 
-var scale = Vector2.One;
+                var scale = Vector2.One;
 
-if (isWet)
-{
-    float globalTime = Time.Ticks / 1000f;
+                if (animateWater || animateFoliage)
+                {
+                    float globalTime = Time.Ticks / 1000f;
 
-    if (animationSeed != 0)
-    {
-        // Shared wind gust cycle for foliage with delayed start/stop per tile.
-        float offset = (animationSeed & 0xFF) / 255f * 0.8f;
-        float localWindTime = globalTime - offset;
+                    if (animateFoliage && animationSeed != 0)
+                    {
+                        float weatherSway = Weather.FoliageSwayIntensity;
 
-        const float gustPeriod = 14f;
-        float gustWave = 0.5f + 0.5f * (float)Math.Sin((localWindTime / gustPeriod) * MathHelper.TwoPi);
+                        // Spatially-stable phase so nearby trees move differently and gusts travel across terrain.
+                        float phase = ((animationSeed & 0xFFFF) / 65535f) * MathHelper.TwoPi;
+                        float gustDelay = (animationSeed & 0xFF) / 255f * 1.35f;
+                        float localTime = globalTime - gustDelay;
 
-        float weatherSway = Weather.FoliageSwayIntensity;
-        float gustStrength = Math.Clamp(0.35f + gustWave * 0.65f, 0f, 1f) * weatherSway;
+                        // Low-frequency gust envelope + irregular turbulence for natural acceleration/deceleration.
+                        float gustA = 0.5f + 0.5f * (float)Math.Sin((localTime / 15.0f) * MathHelper.TwoPi + phase);
+                        float gustB = 0.5f + 0.5f * (float)Math.Sin((localTime / 23.0f) * MathHelper.TwoPi + phase * 0.67f);
+                        float turbulence = (float)Math.Sin(localTime * 3.7f + phase * 1.9f) * 0.5f + (float)Math.Sin(localTime * 5.3f + phase * 0.41f) * 0.5f;
 
-        float baseSway = (float)Math.Sin(globalTime * (1.25f + weatherSway * 0.55f));
-        float crossSway = (float)Math.Cos(globalTime * (0.95f + weatherSway * 0.4f));
-        float swayX = baseSway * 0.08f * gustStrength;
-        float swayY = crossSway * 0.035f * gustStrength;
+                        float gustStrength = Math.Clamp((0.25f + gustA * 0.5f + gustB * 0.25f + turbulence * 0.12f) * weatherSway, 0f, 1f);
 
-        scale = new Vector2(1.1f + swayX, 1.1f + swayY);
-    }
-    else
-    {
-        // Preserve existing water animation behavior.
-        var sin = (float)Math.Sin(globalTime);
-        var cos = (float)Math.Cos(globalTime);
+                        // Layered sway: strong primary bend + softer cross motion + subtle leaf flutter.
+                        float trunkWave = (float)Math.Sin(localTime * (0.62f + weatherSway * 0.18f) + phase);
+                        float branchWave = (float)Math.Sin(localTime * (1.35f + weatherSway * 0.35f) + phase * 1.37f);
+                        float leafFlutter = (float)Math.Sin(localTime * (4.15f + weatherSway * 0.85f) + phase * 2.21f);
 
-        scale = new Vector2(1.1f + sin * 0.1f, 1.1f + cos * 0.5f * 0.1f);
-    }
-}
+                        float swayX = (trunkWave * 0.045f + branchWave * 0.075f + leafFlutter * 0.02f) * gustStrength;
+                        float swayY = ((float)Math.Cos(localTime * 0.9f + phase * 0.7f) * 0.02f + leafFlutter * 0.01f) * gustStrength;
+
+                        scale = new Vector2(1.1f + swayX, 1.1f + swayY);
+                    }
+                    else if (animateWater)
+                    {
+                        // Preserve water animation behavior.
+                        var sin = (float)Math.Sin(globalTime);
+                        var cos = (float)Math.Cos(globalTime);
+
+                        scale = new Vector2(1.1f + sin * 0.1f, 1.1f + cos * 0.5f * 0.1f);
+                    }
+                }
 
                 batcher.Draw(
                     artInfo.Texture,
