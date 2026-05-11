@@ -121,16 +121,31 @@ namespace ClassicUO.Game.Map
 
             while (obj != null)
             {
-                if (obj.AlphaHue != 0 && obj.PriorityZ > waterZ)
+                if (obj.AlphaHue != 0)
                 {
-                    if (obj is Multi)
+                    bool blocksWater = false;
+                    int height = 0;
+
+                    switch (obj)
                     {
-                        return true;
+                        case Multi m:
+                            blocksWater = true;
+                            height = m.ItemData.Height;
+                            break;
+                        case Static s:
+                            blocksWater = !s.ItemData.IsWet;
+                            height = s.ItemData.Height;
+                            break;
                     }
 
-                    if (obj is Static s && !s.ItemData.IsWet)
+                    if (blocksWater)
                     {
-                        return true;
+                        int topZ = obj.Z + (height > 0 ? height : 1);
+
+                        if (topZ > waterZ)
+                        {
+                            return true;
+                        }
                     }
                 }
 
