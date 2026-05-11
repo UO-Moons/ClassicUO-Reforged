@@ -558,7 +558,7 @@ namespace ClassicUO.Game.GameObjects
                     StepSoundOffset = (incID + 1) % 2;
 
                     Client.Game.Audio.PlaySoundWithDistance(World, soundID, step.X, step.Y);
-                    TryCreateFootstepTerrainEffect(step.X, step.Y, step.Run, terrainType, step.Z);
+                    TryCreateFootstepTerrainEffect(step.X, step.Y, step.Run, terrainType, step.Z, surfaceName);
                     LastStepSoundTime = Time.Ticks + delaySound;
                 }
             }
@@ -591,7 +591,7 @@ namespace ClassicUO.Game.GameObjects
             }
         }
 
-        private void TryCreateFootstepTerrainEffect(int stepX, int stepY, bool isRunning, FootstepTerrainType terrainType, sbyte stepZ)
+        private void TryCreateFootstepTerrainEffect(int stepX, int stepY, bool isRunning, FootstepTerrainType terrainType, sbyte stepZ, string surfaceName)
         {
             if (World?.Map == null || World.Player == null)
             {
@@ -600,6 +600,31 @@ namespace ClassicUO.Game.GameObjects
 
             int worldX = (stepX - stepY) * 22;
             int worldY = (stepX + stepY) * 22 + (stepZ << 2) + 2;
+
+            if (!string.IsNullOrEmpty(surfaceName) && surfaceName.Contains("sand"))
+            {
+                World.FootstepSplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                {
+                    Duration = 0.30f,
+                    RiseSpeed = -0.9f,
+                    DropletCount = isRunning ? 10 : 7,
+                    SpreadMultiplier = 1.3f,
+                    EllipseX = 2.8f,
+                    EllipseY = 0.5f,
+                    AngleRangeMin = 20f,
+                    AngleRangeMax = 160f,
+                    BaseSize = 2.1f,
+                    MinDropletSize = 2,
+                    MaxDropletSize = 4,
+                    SizeScaleMultiplier = 1.5f,
+                    BaseColor = new Color(230, 200, 120),
+                    AlphaMultiplier = 0.95f,
+                    AlphaVariationMin = 0.7f,
+                    AlphaVariationMax = 1.0f,
+                    UseWorldCoordinates = true
+                });
+                return;
+            }
 
             switch (terrainType)
             {
