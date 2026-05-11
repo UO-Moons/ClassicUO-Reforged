@@ -108,7 +108,7 @@ namespace ClassicUO.Renderer
             batcher.Begin();
             batcher.GraphicsDevice.Clear(ClearOptions.Target, Color.Black, 0f, 0);
 
-            var rect = new Rectangle(
+            var backgroundRect = new Rectangle(
                 0,
                 0,
                 _gameWindowOnScreen.Width,
@@ -116,7 +116,7 @@ namespace ClassicUO.Renderer
             );
             batcher.DrawTiled(
                 _background,
-                rect,
+                backgroundRect,
                 _background.Bounds,
                 new Vector3(0, 0, 0.1f),
                 0f
@@ -133,15 +133,15 @@ namespace ClassicUO.Renderer
 
             if (_waterReflectionRects.Count > 0 && _waterReflectionAlpha > 0f)
             {
-                foreach (Rectangle rect in _waterReflectionRects)
+                foreach (Rectangle reflectionRect in _waterReflectionRects)
                 {
-                    if (rect.Width <= 0 || rect.Height <= 0) continue;
+                    if (reflectionRect.Width <= 0 || reflectionRect.Height <= 0) continue;
 
-                    Rectangle sourceRect = new Rectangle(rect.X, Math.Max(0, rect.Y - rect.Height), rect.Width, rect.Height);
+                    Rectangle sourceRect = new Rectangle(reflectionRect.X, Math.Max(0, reflectionRect.Y - reflectionRect.Height), reflectionRect.Width, reflectionRect.Height);
 
                     if (sourceRect.Right > WorldRenderTarget.Width || sourceRect.Bottom > WorldRenderTarget.Height) continue;
 
-                    batcher.Draw(WorldRenderTarget, rect, sourceRect, new Vector3(0f, 0f, _waterReflectionAlpha), 0f);
+                    batcher.Draw(WorldRenderTarget, reflectionRect, sourceRect, new Vector3(0f, 0f, _waterReflectionAlpha), 0f);
                 }
             }
 
