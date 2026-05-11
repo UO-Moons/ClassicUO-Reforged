@@ -1718,16 +1718,16 @@ namespace ClassicUO.Game
                 }
             }
 
-            // Only update and render if weather effects are enabled
+            float deltaTime = passed / 1000f; // Convert milliseconds to seconds
+            _world.SplashEffect.Update(deltaTime, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
+            _world.SplashEffect.Draw(batcher, layerDepth);
+
+            _world.RippleEffect.Update(deltaTime, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
+            _world.RippleEffect.Draw(batcher, layerDepth);
+
+            // Rain puddles are still tied to weather effects toggle.
             if (ProfileManager.CurrentProfile?.EnableWeatherEffects == true)
             {
-                float deltaTime = passed / 1000f; // Convert milliseconds to seconds
-                _world.SplashEffect.Update(deltaTime, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
-                _world.SplashEffect.Draw(batcher, layerDepth);
-
-                _world.RippleEffect.Update(deltaTime, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
-                _world.RippleEffect.Draw(batcher, layerDepth);
-
                 bool isRaining = Type == WeatherType.WT_RAIN || Type == WeatherType.WT_STORM_APPROACH;
                 _world.PuddleEffect.Update(deltaTime, isRaining, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
                 _world.PuddleEffect.Draw(batcher, layerDepth);
