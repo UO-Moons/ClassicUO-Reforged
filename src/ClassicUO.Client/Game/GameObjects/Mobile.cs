@@ -558,7 +558,7 @@ namespace ClassicUO.Game.GameObjects
                     StepSoundOffset = (incID + 1) % 2;
 
                     Client.Game.Audio.PlaySoundWithDistance(World, soundID, step.X, step.Y);
-                    TryCreateFootstepTerrainEffect(step.X, step.Y, step.Run, terrainType);
+                    TryCreateFootstepTerrainEffect(step.X, step.Y, step.Run, terrainType, step.Z);
                     LastStepSoundTime = Time.Ticks + delaySound;
                 }
             }
@@ -591,7 +591,7 @@ namespace ClassicUO.Game.GameObjects
             }
         }
 
-        private void TryCreateFootstepTerrainEffect(int stepX, int stepY, bool isRunning, FootstepTerrainType terrainType)
+        private void TryCreateFootstepTerrainEffect(int stepX, int stepY, bool isRunning, FootstepTerrainType terrainType, sbyte stepZ)
         {
             if (World?.Map == null || World.Player == null)
             {
@@ -599,7 +599,7 @@ namespace ClassicUO.Game.GameObjects
             }
 
             int worldX = (stepX - stepY) * 22;
-            int worldY = (stepX + stepY) * 22;
+            int worldY = (stepX + stepY) * 22 + (stepZ << 2) + 2;
 
             switch (terrainType)
             {
