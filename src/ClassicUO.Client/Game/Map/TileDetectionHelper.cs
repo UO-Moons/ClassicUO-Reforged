@@ -82,6 +82,11 @@ namespace ClassicUO.Game.Map
             switch (selectedSurface)
             {
                 case Land land:
+                    if (land.Graphic >= 0x3D65 && land.Graphic <= 0x3E45)
+                    {
+                        return FootstepTerrainType.Swamp;
+                    }
+
                     isWet = land.TileData.IsWet;
                     tileName = land.TileData.Name ?? string.Empty;
                     break;
