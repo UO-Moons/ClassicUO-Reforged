@@ -1,13 +1,83 @@
 // SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Assets;
+using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Utility;
 
 namespace ClassicUO.Game.Map
 {
+    internal enum FootstepTerrainType
+    {
+        Dust,
+        Snow,
+        Water,
+        Swamp
+    }
+
     internal static class TileDetectionHelper
     {
+        public static FootstepTerrainType GetFootstepTerrainType(Map map, int targetTileX, int targetTileY, Season season)
+        {
+            if (map == null) return FootstepTerrainType.Dust;
+
+            Chunk chunk = map.GetChunk(targetTileX, targetTileY, load: false);
+
+            if (chunk == null) return FootstepTerrainType.Dust;
+
+            GameObject obj = chunk.Tiles[targetTileX % 8, targetTileY % 8];
+            GameObject topMostObject = null;
+            sbyte highestZ = sbyte.MinValue;
+
+            while (obj != null)
+            {
+                bool isGraphicValid = obj is Land
+                    ? obj.Graphic < Client.Game.UO.FileManager.TileData.LandData.Length
+                    : obj.Graphic < Client.Game.UO.FileManager.TileData.StaticData.Length;
+
+                if ((sbyte)obj.PriorityZ > highestZ && isGraphicValid && obj.AlphaHue != 0)
+                {
+                    highestZ = (sbyte)obj.PriorityZ;
+                    topMostObject = obj;
+                }
+                obj = obj.TNext;
+            }
+
+            if (topMostObject is null)
+            {
+                return season == Season.Winter ? FootstepTerrainType.Snow : FootstepTerrainType.Dust;
+            }
+
+            bool isWet = false;
+            string tileName = string.Empty;
+
+            switch (topMostObject)
+            {
+                case Land land:
+                    isWet = land.TileData.IsWet;
+                    tileName = land.TileData.Name ?? string.Empty;
+                    break;
+                case Static staticTile:
+                    isWet = staticTile.ItemData.IsWet;
+                    tileName = staticTile.ItemData.Name ?? string.Empty;
+                    break;
+            }
+
+            string loweredName = tileName.ToLowerInvariant();
+
+            if (isWet && loweredName.Contains("water"))
+            {
+                return FootstepTerrainType.Water;
+            }
+
+            if (isWet && (loweredName.Contains("swamp") || loweredName.Contains("marsh") || loweredName.Contains("bog") || loweredName.Contains("mud")))
+            {
+                return FootstepTerrainType.Swamp;
+            }
+
+            return season == Season.Winter ? FootstepTerrainType.Snow : FootstepTerrainType.Dust;
+        }
+
         /// <summary>
         /// Checks if the given tile position has a covering tile above the specified Z level.
         /// A covering tile is a roof or other structure that blocks weather effects and it's not currently rendering

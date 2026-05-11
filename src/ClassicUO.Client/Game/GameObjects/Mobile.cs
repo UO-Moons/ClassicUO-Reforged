@@ -3,7 +3,9 @@
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
+using ClassicUO.Game.Effects;
 using ClassicUO.Game.Managers;
+using ClassicUO.Game.Map;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
@@ -532,7 +534,8 @@ namespace ClassicUO.Game.GameObjects
                     ref Step step = ref Steps.Back();
 
                     int incID = StepSoundOffset;
-                    int soundID = 0x012B;
+                    FootstepTerrainType terrainType = TileDetectionHelper.GetFootstepTerrainType(World.Map, step.X, step.Y, World.Season);
+                    int soundID = GetFootstepSoundForTerrain(terrainType, incID);
                     int delaySound = 400;
 
                     if (IsMounted)
@@ -551,13 +554,113 @@ namespace ClassicUO.Game.GameObjects
 
                     delaySound = delaySound * 13 / 10;
 
-                    soundID += incID;
-
                     StepSoundOffset = (incID + 1) % 2;
 
                     Client.Game.Audio.PlaySoundWithDistance(World, soundID, step.X, step.Y);
+                    TryCreateFootstepTerrainEffect(step.X, step.Y, step.Run, terrainType);
                     LastStepSoundTime = Time.Ticks + delaySound;
                 }
+            }
+        }
+
+        private static int GetFootstepSoundForTerrain(FootstepTerrainType terrainType, int incID)
+        {
+            switch (terrainType)
+            {
+                case FootstepTerrainType.Snow:
+                    return 0x341;
+                case FootstepTerrainType.Water:
+                    return 0x12E;
+                case FootstepTerrainType.Swamp:
+                    return 0x12F;
+                default:
+                    return 0x33D + (incID & 1);
+            }
+        }
+
+        private void TryCreateFootstepTerrainEffect(int stepX, int stepY, bool isRunning, FootstepTerrainType terrainType)
+        {
+            if (World?.Map == null || World.Player == null)
+            {
+                return;
+            }
+
+            int worldX = (stepX - stepY) * 22;
+            int worldY = (stepX + stepY) * 22;
+
+            switch (terrainType)
+            {
+                case FootstepTerrainType.Water:
+                    World.RippleEffect.CreateRipple(worldX, worldY);
+                    World.SplashEffect.CreateSplash(worldX, worldY, SplashConfig.WaterSplash());
+                    break;
+                case FootstepTerrainType.Swamp:
+                    World.RippleEffect.CreateRipple(worldX, worldY);
+                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    {
+                        Duration = 0.20f,
+                        RiseSpeed = -1.4f,
+                        DropletCount = isRunning ? 7 : 5,
+                        SpreadMultiplier = 0.8f,
+                        EllipseX = 2.5f,
+                        EllipseY = 0.25f,
+                        AngleRangeMin = 15f,
+                        AngleRangeMax = 145f,
+                        BaseSize = 1.0f,
+                        MinDropletSize = 1,
+                        MaxDropletSize = 2,
+                        SizeScaleMultiplier = 1.2f,
+                        BaseColor = new Color(90, 120, 80),
+                        AlphaMultiplier = 0.65f,
+                        AlphaVariationMin = 0.55f,
+                        AlphaVariationMax = 0.9f,
+                        UseWorldCoordinates = true
+                    });
+                    break;
+                case FootstepTerrainType.Snow:
+                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    {
+                        Duration = 0.18f,
+                        RiseSpeed = -0.8f,
+                        DropletCount = isRunning ? 7 : 5,
+                        SpreadMultiplier = 0.7f,
+                        EllipseX = 2.0f,
+                        EllipseY = 0.4f,
+                        AngleRangeMin = 20f,
+                        AngleRangeMax = 160f,
+                        BaseSize = 1.2f,
+                        MinDropletSize = 1,
+                        MaxDropletSize = 2,
+                        SizeScaleMultiplier = 1.1f,
+                        BaseColor = Color.White,
+                        AlphaMultiplier = 0.6f,
+                        AlphaVariationMin = 0.5f,
+                        AlphaVariationMax = 0.85f,
+                        UseWorldCoordinates = true
+                    });
+                    break;
+                default:
+                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    {
+                        Duration = 0.16f,
+                        RiseSpeed = -1.0f,
+                        DropletCount = isRunning ? 6 : 4,
+                        SpreadMultiplier = 0.6f,
+                        EllipseX = 1.8f,
+                        EllipseY = 0.35f,
+                        AngleRangeMin = 25f,
+                        AngleRangeMax = 155f,
+                        BaseSize = 1.0f,
+                        MinDropletSize = 1,
+                        MaxDropletSize = 2,
+                        SizeScaleMultiplier = 1.0f,
+                        BaseColor = new Color(190, 170, 130),
+                        AlphaMultiplier = 0.45f,
+                        AlphaVariationMin = 0.4f,
+                        AlphaVariationMax = 0.7f,
+                        UseWorldCoordinates = true
+                    });
+                    break;
             }
         }
 
