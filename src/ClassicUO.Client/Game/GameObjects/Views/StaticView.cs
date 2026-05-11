@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Configuration;
+using ClassicUO.Game.Map;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.Scenes;
 using ClassicUO.IO;
@@ -92,7 +93,8 @@ DrawStaticAnimated(
         && (isTree || ItemData.IsFoliage || StaticFilters.IsRock(graphic)),
     depth,
     ProfileManager.CurrentProfile.AnimatedWaterEffect
-        && ItemData.IsWet,
+        && ItemData.IsWet
+        && !TileDetectionHelper.HasWaterSurfaceBlocker(World.Map, X, Y, Z),
     isSwayingLeaf,
     isSwayingLeaf
         ? (uint)((X * 73856093) ^ (Y * 19349663) ^ graphic)

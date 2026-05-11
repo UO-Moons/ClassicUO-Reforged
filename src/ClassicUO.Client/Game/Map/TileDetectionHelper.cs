@@ -105,5 +105,54 @@ namespace ClassicUO.Game.Map
 
             return false;
         }
+
+        /// <summary>
+        /// Checks if water animation should be blocked because another visible object is above the water surface.
+        /// Useful for preventing animated-water distortion from bleeding into boat interiors.
+        /// </summary>
+        public static bool HasWaterSurfaceBlocker(Map map, int targetTileX, int targetTileY, sbyte waterZ)
+        {
+            if (map == null) return false;
+
+            Chunk chunk = map.GetChunk(targetTileX, targetTileY, load: false);
+            if (chunk == null) return false;
+
+            GameObject obj = chunk.GetHeadObject(targetTileX % 8, targetTileY % 8);
+
+            while (obj != null)
+            {
+                if (obj.AlphaHue != 0)
+                {
+                    bool blocksWater = false;
+                    int height = 0;
+
+                    switch (obj)
+                    {
+                        case Multi m:
+                            blocksWater = true;
+                            height = m.ItemData.Height;
+                            break;
+                        case Static s:
+                            blocksWater = !s.ItemData.IsWet;
+                            height = s.ItemData.Height;
+                            break;
+                    }
+
+                    if (blocksWater)
+                    {
+                        int topZ = obj.Z + (height > 0 ? height : 1);
+
+                        if (topZ > waterZ)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                obj = obj.TNext;
+            }
+
+            return false;
+        }
     }
 }
