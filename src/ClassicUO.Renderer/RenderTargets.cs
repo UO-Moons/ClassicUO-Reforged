@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 
 
 namespace ClassicUO.Renderer
@@ -21,10 +22,20 @@ namespace ClassicUO.Renderer
 
         private Texture2D _background;
         private SamplerState _defaultSamplerState;
+        private List<Rectangle> _waterReflectionRects = new();
+        private float _waterReflectionAlpha;
+        private uint _waterReflectionTime;
 
         public RenderTarget2D UiRenderTarget { get => _uiRenderTarget; }
         public RenderTarget2D LightRenderTarget { get => _lightRenderTarget; }
         public RenderTarget2D WorldRenderTarget { get => _worldRenderTarget; }
+
+        public void SetWaterReflectionRects(List<Rectangle> rects, float alpha, uint timeTicks = 0)
+        {
+            _waterReflectionRects = rects ?? new List<Rectangle>();
+            _waterReflectionAlpha = Math.Clamp(alpha, 0f, 1f);
+            _waterReflectionTime = timeTicks;
+        }
 
         public void SetLightsConfiguration(Func<BlendState> lightsBlendState, Func<Vector3> lightsHue)
         {
@@ -99,7 +110,7 @@ namespace ClassicUO.Renderer
             batcher.Begin();
             batcher.GraphicsDevice.Clear(ClearOptions.Target, Color.Black, 0f, 0);
 
-            var rect = new Rectangle(
+            var backgroundRect = new Rectangle(
                 0,
                 0,
                 _gameWindowOnScreen.Width,
@@ -107,7 +118,7 @@ namespace ClassicUO.Renderer
             );
             batcher.DrawTiled(
                 _background,
-                rect,
+                backgroundRect,
                 _background.Bounds,
                 new Vector3(0, 0, 0.1f),
                 0f
@@ -121,6 +132,22 @@ namespace ClassicUO.Renderer
                 fullAlphaNoColor,
                 0f
             );
+
+            if (_waterReflectionRects.Count > 0 && _waterReflectionAlpha > 0f)
+            {
+                foreach (Rectangle reflectionRect in _waterReflectionRects)
+                {
+                    if (reflectionRect.Width <= 0 || reflectionRect.Height <= 0) continue;
+
+                    int waveOffset = (int)(MathF.Sin((reflectionRect.X + _waterReflectionTime * 0.07f) * 0.08f) * 2.0f);
+                    Rectangle sourceRect = new Rectangle(reflectionRect.X + waveOffset, Math.Max(0, reflectionRect.Y - reflectionRect.Height), reflectionRect.Width, reflectionRect.Height);
+
+                    if (sourceRect.X < 0 || sourceRect.Y < 0 || sourceRect.Right > WorldRenderTarget.Width || sourceRect.Bottom > WorldRenderTarget.Height) continue;
+
+                    float perTileAlpha = _waterReflectionAlpha * (0.85f + (MathF.Sin((reflectionRect.Y + _waterReflectionTime * 0.03f) * 0.05f) * 0.15f));
+                    batcher.Draw(WorldRenderTarget, reflectionRect, sourceRect, new Vector3(0f, 0f, perTileAlpha), 0f);
+                }
+            }
 
             // draw lights
             batcher.SetBlendState(_lightsBlendState?.Invoke());
