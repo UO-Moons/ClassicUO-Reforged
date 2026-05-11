@@ -534,7 +534,7 @@ namespace ClassicUO.Game.GameObjects
                     ref Step step = ref Steps.Back();
 
                     int incID = StepSoundOffset;
-                    FootstepTerrainType terrainType = TileDetectionHelper.GetFootstepTerrainType(World.Map, step.X, step.Y, World.Season);
+                    FootstepTerrainType terrainType = TileDetectionHelper.GetFootstepTerrainType(World.Map, step.X, step.Y, step.Z, World.Season);
                     int soundID = GetFootstepSoundForTerrain(terrainType, incID);
                     int delaySound = 400;
 
