@@ -918,7 +918,7 @@ namespace ClassicUO.Game.Scenes
             can_draw_lights = PrepareLightsRendering(batcher, ref matrix, renderTargets);
             batcher.GraphicsDevice.Viewport = camera_viewport;
 
-            renderTargets.SetWaterReflectionRects(BuildPhase1WaterReflectionRects(), 0.18f);
+            renderTargets.SetWaterReflectionRects(BuildPhase1WaterReflectionRects(), 0.22f, Time.Ticks);
             DrawWorld(batcher, ref matrix, renderTargets);
 
             batcher.GraphicsDevice.Viewport = r_viewport;
