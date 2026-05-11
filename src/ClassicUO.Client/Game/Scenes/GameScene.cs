@@ -963,6 +963,40 @@ namespace ClassicUO.Game.Scenes
                 }
             }
 
+            // Phase 2: add mobile reflection patches when standing on/near water.
+            foreach (Mobile mobile in _world.Mobiles.Values)
+            {
+                if (mobile == null || mobile.IsDestroyed)
+                {
+                    continue;
+                }
+
+                bool isNearWater = TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y)
+                    || TileDetectionHelper.IsWaterTile(_world.Map, mobile.X + 1, mobile.Y)
+                    || TileDetectionHelper.IsWaterTile(_world.Map, mobile.X - 1, mobile.Y)
+                    || TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y + 1)
+                    || TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y - 1);
+
+                if (!isNearWater)
+                {
+                    continue;
+                }
+
+                Rectangle mobileReflectionRect = new Rectangle(
+                    mobile.RealScreenPosition.X - 16,
+                    mobile.RealScreenPosition.Y + 18,
+                    32,
+                    20
+                );
+
+                if (mobileReflectionRect.Right < 0 || mobileReflectionRect.Bottom < 0 || mobileReflectionRect.X > Camera.Bounds.Width || mobileReflectionRect.Y > Camera.Bounds.Height)
+                {
+                    continue;
+                }
+
+                _waterReflectionRects.Add(mobileReflectionRect);
+            }
+
             return _waterReflectionRects;
         }
 
