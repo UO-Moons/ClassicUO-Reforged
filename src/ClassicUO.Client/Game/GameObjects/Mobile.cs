@@ -604,12 +604,12 @@ namespace ClassicUO.Game.GameObjects
             switch (terrainType)
             {
                 case FootstepTerrainType.Water:
-                    World.RippleEffect.CreateRipple(worldX, worldY);
-                    World.SplashEffect.CreateSplash(worldX, worldY, SplashConfig.WaterSplash());
+                    World.FootstepRippleEffect.CreateRipple(worldX, worldY);
+                    World.FootstepSplashEffect.CreateSplash(worldX, worldY, SplashConfig.WaterSplash());
                     break;
                 case FootstepTerrainType.Swamp:
-                    World.RippleEffect.CreateRipple(worldX, worldY);
-                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    World.FootstepRippleEffect.CreateRipple(worldX, worldY);
+                    World.FootstepSplashEffect.CreateSplash(worldX, worldY, new SplashConfig
                     {
                         Duration = 0.35f,
                         RiseSpeed = -1.8f,
@@ -631,7 +631,7 @@ namespace ClassicUO.Game.GameObjects
                     });
                     break;
                 case FootstepTerrainType.Snow:
-                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    World.FootstepSplashEffect.CreateSplash(worldX, worldY, new SplashConfig
                     {
                         Duration = 0.35f,
                         RiseSpeed = -1.1f,
@@ -653,7 +653,7 @@ namespace ClassicUO.Game.GameObjects
                     });
                     break;
                 default:
-                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    World.FootstepSplashEffect.CreateSplash(worldX, worldY, new SplashConfig
                     {
                         Duration = 0.16f,
                         RiseSpeed = -1.0f,

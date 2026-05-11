@@ -961,6 +961,8 @@ namespace ClassicUO.Game.Scenes
 
             // draw weather
             _world.Weather.Draw(batcher, 0, 0, MAX_LAYER_DEPTH - 1);
+            
+            DrawFootstepEffects(batcher, MAX_LAYER_DEPTH - 1);
 
             DrawSelection(batcher, MAX_LAYER_DEPTH);
 
@@ -972,6 +974,35 @@ namespace ClassicUO.Game.Scenes
             int switches = batcher.TextureSwitches;
             batcher.GraphicsDevice.SetRenderTarget(null);
             Profiler.ExitContext(Profiler.ProfilerContext.RENDER_FRAME_WORLD);
+        }
+
+        private void DrawFootstepEffects(UltimaBatcher2D batcher, float layerDepth)
+        {
+            if (_world?.Player == null)
+            {
+                return;
+            }
+
+            Point winsize = new Point(Client.Game.Scene.Camera.Bounds.Width, Client.Game.Scene.Camera.Bounds.Height);
+
+            int tileOffX = _world.Player.X;
+            int tileOffY = _world.Player.Y;
+            int winGameCenterX = (winsize.X >> 1) + (_world.Player.Z << 2);
+            int winGameCenterY = (winsize.Y >> 1) + (_world.Player.Z << 2);
+            winGameCenterX -= (int)_world.Player.Offset.X;
+            winGameCenterY -= (int)(_world.Player.Offset.Y - _world.Player.Offset.Z);
+
+            int viewportOffsetX = (tileOffX - tileOffY) * 22 - winGameCenterX;
+            int viewportOffsetY = (tileOffX + tileOffY) * 22 - winGameCenterY;
+            int visibleRangeX = winsize.X;
+            int visibleRangeY = winsize.Y;
+            float deltaTime = Time.Delta;
+
+            _world.FootstepSplashEffect.Update(deltaTime, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
+            _world.FootstepSplashEffect.Draw(batcher, layerDepth);
+
+            _world.FootstepRippleEffect.Update(deltaTime, viewportOffsetX, viewportOffsetY, visibleRangeX, visibleRangeY);
+            _world.FootstepRippleEffect.Draw(batcher, layerDepth);
         }
 
         private bool PrepareLightsRendering(UltimaBatcher2D batcher, ref Matrix matrix, RenderTargets renderTargets)

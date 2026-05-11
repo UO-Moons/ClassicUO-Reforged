@@ -50,6 +50,8 @@ namespace ClassicUO.Game
             Weather = new Weather(this);
             RippleEffect = new RippleEffect(this);
             SplashEffect = new SplashEffect();
+            FootstepRippleEffect = new RippleEffect(this);
+            FootstepSplashEffect = new SplashEffect();
             PuddleEffect = new PuddleEffect();
             InfoBars = new InfoBarManager(this);
             DurabilityManager = new DurabilityManager(this);
@@ -106,6 +108,10 @@ namespace ClassicUO.Game
         public RippleEffect RippleEffect { get; }
 
         public SplashEffect SplashEffect { get; }
+        
+        public RippleEffect FootstepRippleEffect { get; }
+
+        public SplashEffect FootstepSplashEffect { get; }
 
         public PuddleEffect PuddleEffect { get; }
 
