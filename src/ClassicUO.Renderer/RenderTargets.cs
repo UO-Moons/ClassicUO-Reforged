@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 
 
 namespace ClassicUO.Renderer
@@ -21,10 +22,18 @@ namespace ClassicUO.Renderer
 
         private Texture2D _background;
         private SamplerState _defaultSamplerState;
+        private List<Rectangle> _waterReflectionRects = new();
+        private float _waterReflectionAlpha;
 
         public RenderTarget2D UiRenderTarget { get => _uiRenderTarget; }
         public RenderTarget2D LightRenderTarget { get => _lightRenderTarget; }
         public RenderTarget2D WorldRenderTarget { get => _worldRenderTarget; }
+
+        public void SetWaterReflectionRects(List<Rectangle> rects, float alpha)
+        {
+            _waterReflectionRects = rects ?? new List<Rectangle>();
+            _waterReflectionAlpha = Math.Clamp(alpha, 0f, 1f);
+        }
 
         public void SetLightsConfiguration(Func<BlendState> lightsBlendState, Func<Vector3> lightsHue)
         {
@@ -121,6 +130,20 @@ namespace ClassicUO.Renderer
                 fullAlphaNoColor,
                 0f
             );
+
+            if (_waterReflectionRects.Count > 0 && _waterReflectionAlpha > 0f)
+            {
+                foreach (Rectangle rect in _waterReflectionRects)
+                {
+                    if (rect.Width <= 0 || rect.Height <= 0) continue;
+
+                    Rectangle sourceRect = new Rectangle(rect.X, Math.Max(0, rect.Y - rect.Height), rect.Width, rect.Height);
+
+                    if (sourceRect.Right > WorldRenderTarget.Width || sourceRect.Bottom > WorldRenderTarget.Height) continue;
+
+                    batcher.Draw(WorldRenderTarget, rect, sourceRect, new Vector3(0f, 0f, _waterReflectionAlpha), 0f);
+                }
+            }
 
             // draw lights
             batcher.SetBlendState(_lightsBlendState?.Invoke());
