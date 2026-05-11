@@ -926,6 +926,31 @@ namespace ClassicUO.Game.Scenes
             return base.Draw(batcher, renderTargets);
         }
 
+        private bool HasReflectionBlocker(int tileX, int tileY)
+        {
+            GameObject tile = _world.Map?.GetTile(tileX, tileY, false);
+
+            while (tile != null)
+            {
+                if (tile.AlphaHue != 0)
+                {
+                    if (tile is Multi)
+                    {
+                        return true;
+                    }
+
+                    if (tile is Static s && s.ItemData.IsImpassable)
+                    {
+                        return true;
+                    }
+                }
+
+                tile = tile.TNext;
+            }
+
+            return false;
+        }
+
         private List<Rectangle> BuildPhase1WaterReflectionRects()
         {
             _waterReflectionRects.Clear();
@@ -945,7 +970,7 @@ namespace ClassicUO.Game.Scenes
             {
                 for (int ty = _world.Player.Y - range; ty <= _world.Player.Y + range; ty++)
                 {
-                    if (!TileDetectionHelper.IsWaterTile(_world.Map, tx, ty))
+                    if (!TileDetectionHelper.IsWaterTile(_world.Map, tx, ty) || HasReflectionBlocker(tx, ty))
                     {
                         continue;
                     }
@@ -971,11 +996,11 @@ namespace ClassicUO.Game.Scenes
                     continue;
                 }
 
-                bool isNearWater = TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y)
-                    || TileDetectionHelper.IsWaterTile(_world.Map, mobile.X + 1, mobile.Y)
-                    || TileDetectionHelper.IsWaterTile(_world.Map, mobile.X - 1, mobile.Y)
-                    || TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y + 1)
-                    || TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y - 1);
+                bool isNearWater = (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y) && !HasReflectionBlocker(mobile.X, mobile.Y))
+                    || (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X + 1, mobile.Y) && !HasReflectionBlocker(mobile.X + 1, mobile.Y))
+                    || (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X - 1, mobile.Y) && !HasReflectionBlocker(mobile.X - 1, mobile.Y))
+                    || (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y + 1) && !HasReflectionBlocker(mobile.X, mobile.Y + 1))
+                    || (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y - 1) && !HasReflectionBlocker(mobile.X, mobile.Y - 1));
 
                 if (!isNearWater)
                 {
