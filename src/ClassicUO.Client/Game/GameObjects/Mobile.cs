@@ -535,7 +535,8 @@ namespace ClassicUO.Game.GameObjects
 
                     int incID = StepSoundOffset;
                     FootstepTerrainType terrainType = TileDetectionHelper.GetFootstepTerrainType(World.Map, step.X, step.Y, step.Z, World.Season);
-                    int soundID = GetFootstepSoundForTerrain(terrainType, incID);
+                    string surfaceName = TileDetectionHelper.GetFootstepSurfaceName(World.Map, step.X, step.Y, step.Z);
+                    int soundID = GetFootstepSoundForTerrain(terrainType, surfaceName, incID);
                     int delaySound = 400;
 
                     if (IsMounted)
@@ -563,8 +564,20 @@ namespace ClassicUO.Game.GameObjects
             }
         }
 
-        private static int GetFootstepSoundForTerrain(FootstepTerrainType terrainType, int incID)
+        private static int GetFootstepSoundForTerrain(FootstepTerrainType terrainType, string surfaceName, int incID)
         {
+            if (!string.IsNullOrEmpty(surfaceName))
+            {
+                if (surfaceName.Contains("wooden floor") || surfaceName.Contains("planks")) return 0x343;
+                if (surfaceName.Contains("sand")) return 0x33F;
+                if (surfaceName.Contains("grass") || surfaceName.Contains("forest") || surfaceName.Contains("leaves") || surfaceName.Contains("jungle")) return 0x12D;
+                if (surfaceName.Contains("dirt") || surfaceName.Contains("rock") || surfaceName.Contains("cave") || surfaceName.Contains("cavern") || surfaceName.Contains("cobble")) return 0x33B;
+                if (surfaceName.Contains("tile") || surfaceName.Contains("stone") || surfaceName.Contains("marble") || surfaceName.Contains("brick") || surfaceName.Contains("flagstone")) return 0x33D + (incID & 1);
+                if (surfaceName.Contains("snow") || surfaceName.Contains("tundra")) return 0x341;
+                if (surfaceName.Contains("swamp") || surfaceName.Contains("mud") || surfaceName.Contains("marsh") || surfaceName.Contains("moss")) return 0x133;
+                if (surfaceName.Contains("water") || surfaceName.Contains("ocean") || surfaceName.Contains("river") || surfaceName.Contains("sea")) return 0x133;
+            }
+
             switch (terrainType)
             {
                 case FootstepTerrainType.Snow:
@@ -572,7 +585,7 @@ namespace ClassicUO.Game.GameObjects
                 case FootstepTerrainType.Water:
                     return 0x12E;
                 case FootstepTerrainType.Swamp:
-                    return 0x12F;
+                    return 0x133;
                 default:
                     return 0x33D + (incID & 1);
             }

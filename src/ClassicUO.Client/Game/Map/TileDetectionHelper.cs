@@ -106,6 +106,55 @@ namespace ClassicUO.Game.Map
             return season == Season.Winter ? FootstepTerrainType.Snow : FootstepTerrainType.Dust;
         }
 
+        public static string GetFootstepSurfaceName(Map map, int targetTileX, int targetTileY, int stepZ)
+        {
+            if (map == null) return string.Empty;
+            Chunk chunk = map.GetChunk(targetTileX, targetTileY, load: false);
+            if (chunk == null) return string.Empty;
+
+            GameObject obj = chunk.Tiles[targetTileX % 8, targetTileY % 8];
+            GameObject bestSurface = null;
+            int bestDistance = int.MaxValue;
+            sbyte bestZ = sbyte.MinValue;
+
+            while (obj != null)
+            {
+                if (!(obj is Land) && !(obj is Static))
+                {
+                    obj = obj.TNext;
+                    continue;
+                }
+
+                bool isGraphicValid = obj is Land
+                    ? obj.Graphic < Client.Game.UO.FileManager.TileData.LandData.Length
+                    : obj.Graphic < Client.Game.UO.FileManager.TileData.StaticData.Length;
+
+                if (!isGraphicValid)
+                {
+                    obj = obj.TNext;
+                    continue;
+                }
+
+                sbyte surfaceZ = obj is Land landObj ? landObj.AverageZ : obj.Z;
+                int zDistance = Math.Abs(surfaceZ - stepZ);
+                if (zDistance < bestDistance || (zDistance == bestDistance && surfaceZ > bestZ))
+                {
+                    bestDistance = zDistance;
+                    bestZ = surfaceZ;
+                    bestSurface = obj;
+                }
+
+                obj = obj.TNext;
+            }
+
+            return bestSurface switch
+            {
+                Land land => (land.TileData.Name ?? string.Empty).ToLowerInvariant(),
+                Static staticTile => (staticTile.ItemData.Name ?? string.Empty).ToLowerInvariant(),
+                _ => string.Empty
+            };
+        }
+
         /// <summary>
         /// Checks if the given tile position has a covering tile above the specified Z level.
         /// A covering tile is a roof or other structure that blocks weather effects and it's not currently rendering
