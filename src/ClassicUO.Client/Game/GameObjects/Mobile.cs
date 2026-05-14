@@ -534,9 +534,8 @@ namespace ClassicUO.Game.GameObjects
                     ref Step step = ref Steps.Back();
 
                     int incID = StepSoundOffset;
-                    FootstepTerrainType terrainType = TileDetectionHelper.GetFootstepTerrainType(World.Map, step.X, step.Y, step.Z, World.Season);
-                    string surfaceName = TileDetectionHelper.GetFootstepSurfaceName(World.Map, step.X, step.Y, step.Z);
-                    int soundID = GetFootstepSoundForTerrain(terrainType, surfaceName, incID);
+                    FootstepTerrainType terrainType = TileDetectionHelper.GetFootstepTerrainType(World.Map, step.X, step.Y, World.Season);
+                    int soundID = GetFootstepSoundForTerrain(terrainType, incID);
                     int delaySound = 400;
 
                     if (IsMounted)
@@ -558,7 +557,7 @@ namespace ClassicUO.Game.GameObjects
                     StepSoundOffset = (incID + 1) % 2;
 
                     Client.Game.Audio.PlaySoundWithDistance(World, soundID, step.X, step.Y);
-                    TryCreateFootstepTerrainEffect(step.X, step.Y, step.Run, terrainType, step.Z, surfaceName);
+                    TryCreateFootstepTerrainEffect(step.X, step.Y, step.Run, terrainType);
                     LastStepSoundTime = Time.Ticks + delaySound;
                 }
             }
@@ -578,6 +577,8 @@ namespace ClassicUO.Game.GameObjects
                 if (surfaceName.Contains("water") || surfaceName.Contains("ocean") || surfaceName.Contains("river") || surfaceName.Contains("sea")) return 0x133;
             }
 
+        private static int GetFootstepSoundForTerrain(FootstepTerrainType terrainType, int incID)
+        {
             switch (terrainType)
             {
                 case FootstepTerrainType.Snow:
@@ -585,13 +586,13 @@ namespace ClassicUO.Game.GameObjects
                 case FootstepTerrainType.Water:
                     return 0x12E;
                 case FootstepTerrainType.Swamp:
-                    return 0x133;
+                    return 0x12F;
                 default:
                     return 0x33D + (incID & 1);
             }
         }
 
-        private void TryCreateFootstepTerrainEffect(int stepX, int stepY, bool isRunning, FootstepTerrainType terrainType, sbyte stepZ, string surfaceName)
+        private void TryCreateFootstepTerrainEffect(int stepX, int stepY, bool isRunning, FootstepTerrainType terrainType)
         {
             if (World?.Map == null || World.Player == null)
             {
@@ -599,86 +600,61 @@ namespace ClassicUO.Game.GameObjects
             }
 
             int worldX = (stepX - stepY) * 22;
-            int worldY = (stepX + stepY) * 22 + (stepZ << 2) + 2;
-
-            if (!string.IsNullOrEmpty(surfaceName) && surfaceName.Contains("sand"))
-            {
-                World.FootstepSplashEffect.CreateSplash(worldX, worldY, new SplashConfig
-                {
-                    Duration = 0.30f,
-                    RiseSpeed = -0.9f,
-                    DropletCount = isRunning ? 10 : 7,
-                    SpreadMultiplier = 1.3f,
-                    EllipseX = 2.8f,
-                    EllipseY = 0.5f,
-                    AngleRangeMin = 20f,
-                    AngleRangeMax = 160f,
-                    BaseSize = 2.1f,
-                    MinDropletSize = 2,
-                    MaxDropletSize = 4,
-                    SizeScaleMultiplier = 1.5f,
-                    BaseColor = new Color(230, 200, 120),
-                    AlphaMultiplier = 0.95f,
-                    AlphaVariationMin = 0.7f,
-                    AlphaVariationMax = 1.0f,
-                    UseWorldCoordinates = true
-                });
-                return;
-            }
+            int worldY = (stepX + stepY) * 22;
 
             switch (terrainType)
             {
                 case FootstepTerrainType.Water:
-                    World.FootstepRippleEffect.CreateRipple(worldX, worldY);
-                    World.FootstepSplashEffect.CreateSplash(worldX, worldY, SplashConfig.WaterSplash());
+                    World.RippleEffect.CreateRipple(worldX, worldY);
+                    World.SplashEffect.CreateSplash(worldX, worldY, SplashConfig.WaterSplash());
                     break;
                 case FootstepTerrainType.Swamp:
-                    World.FootstepRippleEffect.CreateRipple(worldX, worldY);
-                    World.FootstepSplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    World.RippleEffect.CreateRipple(worldX, worldY);
+                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
                     {
-                        Duration = 0.35f,
-                        RiseSpeed = -1.8f,
-                        DropletCount = isRunning ? 12 : 9,
-                        SpreadMultiplier = 1.2f,
-                        EllipseX = 3.2f,
-                        EllipseY = 0.35f,
+                        Duration = 0.20f,
+                        RiseSpeed = -1.4f,
+                        DropletCount = isRunning ? 7 : 5,
+                        SpreadMultiplier = 0.8f,
+                        EllipseX = 2.5f,
+                        EllipseY = 0.25f,
                         AngleRangeMin = 15f,
                         AngleRangeMax = 145f,
-                        BaseSize = 2.2f,
-                        MinDropletSize = 3,
-                        MaxDropletSize = 4,
-                        SizeScaleMultiplier = 1.5f,
-                        BaseColor = new Color(40, 220, 90),
-                        AlphaMultiplier = 0.95f,
-                        AlphaVariationMin = 0.75f,
-                        AlphaVariationMax = 1.0f,
+                        BaseSize = 1.0f,
+                        MinDropletSize = 1,
+                        MaxDropletSize = 2,
+                        SizeScaleMultiplier = 1.2f,
+                        BaseColor = new Color(90, 120, 80),
+                        AlphaMultiplier = 0.65f,
+                        AlphaVariationMin = 0.55f,
+                        AlphaVariationMax = 0.9f,
                         UseWorldCoordinates = true
                     });
                     break;
                 case FootstepTerrainType.Snow:
-                    World.FootstepSplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
                     {
-                        Duration = 0.35f,
-                        RiseSpeed = -1.1f,
-                        DropletCount = isRunning ? 12 : 9,
-                        SpreadMultiplier = 1.1f,
-                        EllipseX = 2.8f,
-                        EllipseY = 0.6f,
+                        Duration = 0.18f,
+                        RiseSpeed = -0.8f,
+                        DropletCount = isRunning ? 7 : 5,
+                        SpreadMultiplier = 0.7f,
+                        EllipseX = 2.0f,
+                        EllipseY = 0.4f,
                         AngleRangeMin = 20f,
                         AngleRangeMax = 160f,
-                        BaseSize = 2.4f,
-                        MinDropletSize = 3,
-                        MaxDropletSize = 4,
-                        SizeScaleMultiplier = 1.4f,
-                        BaseColor = new Color(110, 170, 255),
-                        AlphaMultiplier = 0.95f,
-                        AlphaVariationMin = 0.75f,
-                        AlphaVariationMax = 1.0f,
+                        BaseSize = 1.2f,
+                        MinDropletSize = 1,
+                        MaxDropletSize = 2,
+                        SizeScaleMultiplier = 1.1f,
+                        BaseColor = Color.White,
+                        AlphaMultiplier = 0.6f,
+                        AlphaVariationMin = 0.5f,
+                        AlphaVariationMax = 0.85f,
                         UseWorldCoordinates = true
                     });
                     break;
                 default:
-                    World.FootstepSplashEffect.CreateSplash(worldX, worldY, new SplashConfig
+                    World.SplashEffect.CreateSplash(worldX, worldY, new SplashConfig
                     {
                         Duration = 0.16f,
                         RiseSpeed = -1.0f,

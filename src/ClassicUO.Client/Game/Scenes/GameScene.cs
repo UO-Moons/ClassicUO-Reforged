@@ -1,10 +1,11 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.Managers;
+using ClassicUO.Game.Map;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Input;
 using ClassicUO.Network;
@@ -67,6 +68,7 @@ namespace ClassicUO.Game.Scenes
         private AnimatedStaticsManager _animatedStaticsManager;
 
         private readonly World _world;
+        private readonly List<Rectangle> _waterReflectionRects = new();
 
         public GameScene(World world)
         {
@@ -916,11 +918,111 @@ namespace ClassicUO.Game.Scenes
             can_draw_lights = PrepareLightsRendering(batcher, ref matrix, renderTargets);
             batcher.GraphicsDevice.Viewport = camera_viewport;
 
+            renderTargets.SetWaterReflectionRects(BuildPhase1WaterReflectionRects(), 0.22f, Time.Ticks);
             DrawWorld(batcher, ref matrix, renderTargets);
 
             batcher.GraphicsDevice.Viewport = r_viewport;
 
             return base.Draw(batcher, renderTargets);
+        }
+
+        private bool HasReflectionBlocker(int tileX, int tileY)
+        {
+            GameObject tile = _world.Map?.GetTile(tileX, tileY, false);
+
+            while (tile != null)
+            {
+                if (tile.AlphaHue != 0)
+                {
+                    if (tile is Multi)
+                    {
+                        return true;
+                    }
+
+                    if (tile is Static s && s.ItemData.IsImpassable)
+                    {
+                        return true;
+                    }
+                }
+
+                tile = tile.TNext;
+            }
+
+            return false;
+        }
+
+        private List<Rectangle> BuildPhase1WaterReflectionRects()
+        {
+            _waterReflectionRects.Clear();
+
+            if (_world?.Map == null || _world.Player == null)
+            {
+                return _waterReflectionRects;
+            }
+
+            int halfW = Camera.Bounds.Width >> 1;
+            int halfH = Camera.Bounds.Height >> 1;
+            int winDrawOffsetX = (_world.Player.X - _world.Player.Y) * 22 - halfW;
+            int winDrawOffsetY = (_world.Player.X + _world.Player.Y) * 22 - halfH;
+            int range = Math.Max(Camera.Bounds.Width, Camera.Bounds.Height) / 44 + 2;
+
+            for (int tx = _world.Player.X - range; tx <= _world.Player.X + range; tx++)
+            {
+                for (int ty = _world.Player.Y - range; ty <= _world.Player.Y + range; ty++)
+                {
+                    if (!TileDetectionHelper.IsWaterTile(_world.Map, tx, ty) || HasReflectionBlocker(tx, ty))
+                    {
+                        continue;
+                    }
+
+                    int isoX = (tx - ty) * 22 - winDrawOffsetX;
+                    int isoY = (tx + ty) * 22 - winDrawOffsetY;
+                    Rectangle rect = new Rectangle(isoX, isoY, 44, 22);
+
+                    if (rect.Right < 0 || rect.Bottom < 0 || rect.X > Camera.Bounds.Width || rect.Y > Camera.Bounds.Height)
+                    {
+                        continue;
+                    }
+
+                    _waterReflectionRects.Add(rect);
+                }
+            }
+
+            // Phase 2: add mobile reflection patches when standing on/near water.
+            foreach (Mobile mobile in _world.Mobiles.Values)
+            {
+                if (mobile == null || mobile.IsDestroyed)
+                {
+                    continue;
+                }
+
+                bool isNearWater = (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y) && !HasReflectionBlocker(mobile.X, mobile.Y))
+                    || (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X + 1, mobile.Y) && !HasReflectionBlocker(mobile.X + 1, mobile.Y))
+                    || (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X - 1, mobile.Y) && !HasReflectionBlocker(mobile.X - 1, mobile.Y))
+                    || (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y + 1) && !HasReflectionBlocker(mobile.X, mobile.Y + 1))
+                    || (TileDetectionHelper.IsWaterTile(_world.Map, mobile.X, mobile.Y - 1) && !HasReflectionBlocker(mobile.X, mobile.Y - 1));
+
+                if (!isNearWater)
+                {
+                    continue;
+                }
+
+                Rectangle mobileReflectionRect = new Rectangle(
+                    mobile.RealScreenPosition.X - 16,
+                    mobile.RealScreenPosition.Y + 18,
+                    32,
+                    20
+                );
+
+                if (mobileReflectionRect.Right < 0 || mobileReflectionRect.Bottom < 0 || mobileReflectionRect.X > Camera.Bounds.Width || mobileReflectionRect.Y > Camera.Bounds.Height)
+                {
+                    continue;
+                }
+
+                _waterReflectionRects.Add(mobileReflectionRect);
+            }
+
+            return _waterReflectionRects;
         }
 
         private void DrawWorld(UltimaBatcher2D batcher, ref Matrix matrix, RenderTargets renderTargets)

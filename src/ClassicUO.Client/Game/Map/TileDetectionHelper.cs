@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 
-using ClassicUO.Game.Managers;
+using ClassicUO.Assets;
+using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Utility;
 using System;
@@ -17,7 +18,7 @@ namespace ClassicUO.Game.Map
 
     internal static class TileDetectionHelper
     {
-        public static FootstepTerrainType GetFootstepTerrainType(Map map, int targetTileX, int targetTileY, int stepZ, Season season)
+        public static FootstepTerrainType GetFootstepTerrainType(Map map, int targetTileX, int targetTileY, Season season)
         {
             if (map == null) return FootstepTerrainType.Dust;
 
@@ -26,52 +27,24 @@ namespace ClassicUO.Game.Map
             if (chunk == null) return FootstepTerrainType.Dust;
 
             GameObject obj = chunk.Tiles[targetTileX % 8, targetTileY % 8];
-            GameObject bestSurface = null;
-            int bestDistance = int.MaxValue;
-            sbyte bestZ = sbyte.MinValue;
-            GameObject fallbackSurface = null;
-            sbyte fallbackZ = sbyte.MinValue;
+            GameObject topMostObject = null;
+            sbyte highestZ = sbyte.MinValue;
 
             while (obj != null)
             {
-                bool isSurface = obj is Land || obj is Static;
-                if (!isSurface)
-                {
-                    obj = obj.TNext;
-                    continue;
-                }
-
                 bool isGraphicValid = obj is Land
                     ? obj.Graphic < Client.Game.UO.FileManager.TileData.LandData.Length
                     : obj.Graphic < Client.Game.UO.FileManager.TileData.StaticData.Length;
 
-                if (!isGraphicValid)
+                if ((sbyte)obj.PriorityZ > highestZ && isGraphicValid && obj.AlphaHue != 0)
                 {
-                    obj = obj.TNext;
-                    continue;
-                }
-
-                sbyte surfaceZ = obj is Land landObj ? landObj.AverageZ : obj.Z;
-                int zDistance = Math.Abs(surfaceZ - stepZ);
-
-                if (zDistance < bestDistance || (zDistance == bestDistance && surfaceZ > bestZ))
-                {
-                    bestDistance = zDistance;
-                    bestZ = surfaceZ;
-                    bestSurface = obj;
-                }
-
-                if (surfaceZ > fallbackZ)
-                {
-                    fallbackZ = surfaceZ;
-                    fallbackSurface = obj;
+                    highestZ = (sbyte)obj.PriorityZ;
+                    topMostObject = obj;
                 }
                 obj = obj.TNext;
             }
 
-            GameObject selectedSurface = bestSurface ?? fallbackSurface;
-
-            if (selectedSurface is null)
+            if (topMostObject is null)
             {
                 return season == Season.Winter ? FootstepTerrainType.Snow : FootstepTerrainType.Dust;
             }
@@ -87,6 +60,9 @@ namespace ClassicUO.Game.Map
                         return FootstepTerrainType.Swamp;
                     }
 
+            switch (topMostObject)
+            {
+                case Land land:
                     isWet = land.TileData.IsWet;
                     tileName = land.TileData.Name ?? string.Empty;
                     break;
@@ -98,17 +74,7 @@ namespace ClassicUO.Game.Map
 
             string loweredName = tileName.ToLowerInvariant();
 
-            if (loweredName.Contains("snow") || loweredName.Contains("tundra"))
-            {
-                return FootstepTerrainType.Snow;
-            }
-
-            if (loweredName.Contains("swamp") || loweredName.Contains("marsh") || loweredName.Contains("bog") || loweredName.Contains("mud") || loweredName.Contains("moss"))
-            {
-                return FootstepTerrainType.Swamp;
-            }
-
-            if (isWet && (loweredName.Contains("water") || loweredName.Contains("ocean") || loweredName.Contains("sea") || loweredName.Contains("river")))
+            if (isWet && loweredName.Contains("water"))
             {
                 return FootstepTerrainType.Water;
             }
@@ -261,6 +227,55 @@ namespace ClassicUO.Game.Map
                         return staticTile.ItemData.IsWet &&
                             (staticTile.ItemData.Name?.ToLower().Contains("water") == true);
                 }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if water animation should be blocked because another visible object is above the water surface.
+        /// Useful for preventing animated-water distortion from bleeding into boat interiors.
+        /// </summary>
+        public static bool HasWaterSurfaceBlocker(Map map, int targetTileX, int targetTileY, sbyte waterZ)
+        {
+            if (map == null) return false;
+
+            Chunk chunk = map.GetChunk(targetTileX, targetTileY, load: false);
+            if (chunk == null) return false;
+
+            GameObject obj = chunk.GetHeadObject(targetTileX % 8, targetTileY % 8);
+
+            while (obj != null)
+            {
+                if (obj.AlphaHue != 0)
+                {
+                    bool blocksWater = false;
+                    int height = 0;
+
+                    switch (obj)
+                    {
+                        case Multi m:
+                            blocksWater = true;
+                            height = m.ItemData.Height;
+                            break;
+                        case Static s:
+                            blocksWater = !s.ItemData.IsWet;
+                            height = s.ItemData.Height;
+                            break;
+                    }
+
+                    if (blocksWater)
+                    {
+                        int topZ = obj.Z + (height > 0 ? height : 1);
+
+                        if (topZ > waterZ)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                obj = obj.TNext;
             }
 
             return false;

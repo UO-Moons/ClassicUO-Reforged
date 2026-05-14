@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Configuration;
+using ClassicUO.Game.Map;
 using ClassicUO.Assets;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
@@ -87,7 +88,9 @@ namespace ClassicUO.Game.GameObjects
                         posY,
                         hueVec,
                         depth,
-                        ProfileManager.CurrentProfile.AnimatedWaterEffect && TileData.IsWet
+                        ProfileManager.CurrentProfile.AnimatedWaterEffect
+                        && TileData.IsWet
+                        && !TileDetectionHelper.HasWaterSurfaceBlocker(World.Map, X, Y, Z)
                     );
                 }
             }
@@ -100,7 +103,7 @@ namespace ClassicUO.Game.GameObjects
                     var pos = new Vector2(posX, posY);
                     var scale = Vector2.One;
 
-                    if (ProfileManager.CurrentProfile.AnimatedWaterEffect && TileData.IsWet)
+                    if (ProfileManager.CurrentProfile.AnimatedWaterEffect && TileData.IsWet && !TileDetectionHelper.HasWaterSurfaceBlocker(World.Map, X, Y, Z))
                     {
                         batcher.Draw(
                             artInfo.Texture,

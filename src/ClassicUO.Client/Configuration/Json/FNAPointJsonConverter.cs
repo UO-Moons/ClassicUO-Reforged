@@ -72,23 +72,28 @@ namespace ClassicUO.Configuration.Json
     {
         public override Point? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
+            if (reader.TokenType == JsonTokenType.Null)
+            {
+                return null;
+            }
+
             if (reader.TokenType != JsonTokenType.StartObject)
             {
-                return Point.Zero;
+                return null;
             }
 
             reader.Read();
 
             if (reader.TokenType != JsonTokenType.PropertyName)
             {
-                return Point.Zero;
+                return null;
             }
 
             reader.Read();
 
             if (reader.TokenType != JsonTokenType.Number)
             {
-                return Point.Zero;
+                return null;
             }
 
             var point = new Point();
@@ -99,14 +104,14 @@ namespace ClassicUO.Configuration.Json
 
             if (reader.TokenType != JsonTokenType.PropertyName)
             {
-                return Point.Zero;
+                return null;
             }
 
             reader.Read();
 
             if (reader.TokenType != JsonTokenType.Number)
             {
-                return Point.Zero;
+                return null;
             }
 
             point.Y = reader.GetInt32();
@@ -115,7 +120,7 @@ namespace ClassicUO.Configuration.Json
 
             if (reader.TokenType != JsonTokenType.EndObject)
             {
-                return Point.Zero;
+                return null;
             }
 
             return point;
@@ -123,6 +128,12 @@ namespace ClassicUO.Configuration.Json
 
         public override void Write(Utf8JsonWriter writer, Point? value, JsonSerializerOptions options)
         {
+            if (!value.HasValue)
+            {
+                writer.WriteNullValue();
+                return;
+            }
+
             writer.WriteStartObject();
             writer.WriteNumber("X", value.Value.X);
             writer.WriteNumber("Y", value.Value.Y);
