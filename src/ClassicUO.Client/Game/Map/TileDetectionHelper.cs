@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 
-<<<<<<< codex/add-footstep-effects-per-terrain-7owwsw
-using ClassicUO.Game.Managers;
-=======
 using ClassicUO.Assets;
 using ClassicUO.Game.Data;
->>>>>>> main
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Utility;
 using System;
@@ -48,13 +44,7 @@ namespace ClassicUO.Game.Map
                 obj = obj.TNext;
             }
 
-<<<<<<< codex/add-footstep-effects-per-terrain-7owwsw
-            GameObject selectedSurface = bestSurface ?? fallbackSurface;
-
-            if (selectedSurface is null)
-=======
             if (topMostObject is null)
->>>>>>> main
             {
                 return season == Season.Winter ? FootstepTerrainType.Snow : FootstepTerrainType.Dust;
             }
@@ -62,7 +52,6 @@ namespace ClassicUO.Game.Map
             bool isWet = false;
             string tileName = string.Empty;
 
-<<<<<<< codex/add-footstep-effects-per-terrain-7owwsw
             switch (selectedSurface)
             {
                 case Land land:
@@ -71,11 +60,9 @@ namespace ClassicUO.Game.Map
                         return FootstepTerrainType.Swamp;
                     }
 
-=======
             switch (topMostObject)
             {
                 case Land land:
->>>>>>> main
                     isWet = land.TileData.IsWet;
                     tileName = land.TileData.Name ?? string.Empty;
                     break;
@@ -87,11 +74,7 @@ namespace ClassicUO.Game.Map
 
             string loweredName = tileName.ToLowerInvariant();
 
-<<<<<<< codex/add-footstep-effects-per-terrain-7owwsw
-            if (isWet && (loweredName.Contains("water") || loweredName.Contains("ocean") || loweredName.Contains("sea") || loweredName.Contains("river")))
-=======
             if (isWet && loweredName.Contains("water"))
->>>>>>> main
             {
                 return FootstepTerrainType.Water;
             }
@@ -104,7 +87,6 @@ namespace ClassicUO.Game.Map
             return season == Season.Winter ? FootstepTerrainType.Snow : FootstepTerrainType.Dust;
         }
 
-<<<<<<< codex/add-footstep-effects-per-terrain-7owwsw
         public static string GetFootstepSurfaceName(Map map, int targetTileX, int targetTileY, int stepZ)
         {
             if (map == null) return string.Empty;
@@ -154,8 +136,6 @@ namespace ClassicUO.Game.Map
             };
         }
 
-=======
->>>>>>> main
         /// <summary>
         /// Checks if the given tile position has a covering tile above the specified Z level.
         /// A covering tile is a roof or other structure that blocks weather effects and it's not currently rendering
